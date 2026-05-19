@@ -1,8 +1,10 @@
 package com.resourceplanning.resource;
 
 import com.resourceplanning.dto.CreateProjectDto;
+import com.resourceplanning.dto.EmployeeMatchDto;
 import com.resourceplanning.dto.ProjectDto;
 import com.resourceplanning.dto.UpdateProjectDto;
+import com.resourceplanning.service.MatchingService;
 import com.resourceplanning.service.ProjectService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -23,6 +25,9 @@ public class ProjectResource {
 
     @Inject
     ProjectService projectService;
+
+    @Inject
+    MatchingService matchingService;
 
     @GET
     @Operation(summary = "Get all projects")
@@ -58,5 +63,12 @@ public class ProjectResource {
     public Response deleteProject(@PathParam("id") Long id) {
         projectService.delete(id);
         return Response.noContent().build();
+    }
+
+    @GET
+    @Path("/{id}/matching-employees")
+    @Operation(summary = "Get employees matching project skills with available capacity")
+    public List<EmployeeMatchDto> getMatchingEmployees(@PathParam("id") Long id) {
+        return matchingService.findMatchingEmployees(id);
     }
 }
