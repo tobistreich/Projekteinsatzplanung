@@ -5,6 +5,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -16,4 +17,6 @@ public class UpdateProjectDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private ProjectStatus status;
+    /** null = Skills unverändert lassen; [] = alle Skills entfernen */
+    private List<Long> skillIds;
 }

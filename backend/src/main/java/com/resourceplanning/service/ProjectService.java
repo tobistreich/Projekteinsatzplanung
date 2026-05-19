@@ -5,7 +5,9 @@ import com.resourceplanning.dto.ProjectDto;
 import com.resourceplanning.dto.SkillDto;
 import com.resourceplanning.dto.UpdateProjectDto;
 import com.resourceplanning.entity.Project;
+import com.resourceplanning.entity.Skill;
 import com.resourceplanning.repository.ProjectRepository;
+import com.resourceplanning.repository.SkillRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -18,6 +20,9 @@ public class ProjectService {
 
     @Inject
     ProjectRepository projectRepository;
+
+    @Inject
+    SkillRepository skillRepository;
 
     @Transactional
     public List<ProjectDto> getAll() {
@@ -53,6 +58,14 @@ public class ProjectService {
         if (dto.getStartDate() != null) project.setStartDate(dto.getStartDate());
         if (dto.getEndDate() != null) project.setEndDate(dto.getEndDate());
         if (dto.getStatus() != null) project.setStatus(dto.getStatus());
+        if (dto.getSkillIds() != null) {
+            List<Skill> skills = dto.getSkillIds().stream()
+                    .map(sid -> skillRepository.findByIdOptional(sid)
+                            .orElseThrow(() -> new NotFoundException("Skill not found: " + sid)))
+                    .toList();
+            project.getSkills().clear();
+            project.getSkills().addAll(skills);
+        }
         return toDto(project);
     }
 

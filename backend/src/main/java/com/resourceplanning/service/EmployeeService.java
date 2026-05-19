@@ -2,8 +2,10 @@ package com.resourceplanning.service;
 
 import com.resourceplanning.dto.*;
 import com.resourceplanning.entity.Employee;
+import com.resourceplanning.entity.Skill;
 import com.resourceplanning.entity.Team;
 import com.resourceplanning.repository.EmployeeRepository;
+import com.resourceplanning.repository.SkillRepository;
 import com.resourceplanning.repository.TeamRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -20,6 +22,9 @@ public class EmployeeService {
 
     @Inject
     TeamRepository teamRepository;
+
+    @Inject
+    SkillRepository skillRepository;
 
     @Transactional
     public List<EmployeeDto> getAll() {
@@ -64,6 +69,14 @@ public class EmployeeService {
             Team team = teamRepository.findByIdOptional(dto.getTeamId())
                     .orElseThrow(() -> new NotFoundException("Team not found: " + dto.getTeamId()));
             employee.setTeam(team);
+        }
+        if (dto.getSkillIds() != null) {
+            List<Skill> skills = dto.getSkillIds().stream()
+                    .map(sid -> skillRepository.findByIdOptional(sid)
+                            .orElseThrow(() -> new NotFoundException("Skill not found: " + sid)))
+                    .toList();
+            employee.getSkills().clear();
+            employee.getSkills().addAll(skills);
         }
         return toDto(employee);
     }

@@ -3,6 +3,8 @@ package com.resourceplanning.dto;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,4 +16,6 @@ public class UpdateEmployeeDto {
     private String jobTitle;
     private Integer monthlyCapacityHours;
     private Long teamId;
+    /** null = Skills unverändert lassen; [] = alle Skills entfernen */
+    private List<Long> skillIds;
 }
