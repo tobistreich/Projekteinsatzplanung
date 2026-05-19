@@ -13,8 +13,10 @@ import com.resourceplanning.repository.ProjectRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 
+import java.time.YearMonth;
 import java.util.List;
 
 @ApplicationScoped
@@ -63,6 +65,7 @@ public class AssignmentService {
                 .orElseThrow(() -> new NotFoundException("Employee not found: " + dto.getEmployeeId()));
         Project project = projectRepository.findByIdOptional(dto.getProjectId())
                 .orElseThrow(() -> new NotFoundException("Project not found: " + dto.getProjectId()));
+        validateCapacity(employee, dto);
         Assignment assignment = Assignment.builder()
                 .employee(employee)
                 .project(project)
@@ -79,6 +82,32 @@ public class AssignmentService {
     public void delete(Long id) {
         if (!assignmentRepository.deleteById(id)) {
             throw new NotFoundException("Assignment not found: " + id);
+        }
+    }
+
+    private void validateCapacity(Employee employee, CreateAssignmentDto dto) {
+        if (employee.getMonthlyCapacityHours() == null || dto.getAllocationHoursPerMonth() == null) return;
+
+        List<Assignment> existing = assignmentRepository.findByEmployeeId(employee.getId());
+
+        YearMonth start = YearMonth.from(dto.getStartDate());
+        YearMonth end = YearMonth.from(dto.getEndDate());
+
+        for (YearMonth month = start; !month.isAfter(end); month = month.plusMonths(1)) {
+            final YearMonth m = month;
+            int total = dto.getAllocationHoursPerMonth() + existing.stream()
+                    .filter(a -> a.getAllocationHoursPerMonth() != null)
+                    .filter(a -> !YearMonth.from(a.getStartDate()).isAfter(m)
+                              && !YearMonth.from(a.getEndDate()).isBefore(m))
+                    .mapToInt(Assignment::getAllocationHoursPerMonth)
+                    .sum();
+
+            if (total > employee.getMonthlyCapacityHours()) {
+                throw new BadRequestException(
+                        "Kapazität überschritten für " + m + ": " + total + "h von max. "
+                        + employee.getMonthlyCapacityHours() + "h"
+                );
+            }
         }
     }
 
