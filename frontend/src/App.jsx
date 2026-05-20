@@ -1,14 +1,16 @@
-import AppBadge from "@/components/AppBadge"
-import Workload from "./components/Workload"
+import { Navigate, Route, Routes } from 'react-router-dom'
+import EmployeesPage from './pages/EmployeesPage'
+import ProjectsPage from './pages/ProjectsPage'
+import MyAssignmentPage from './pages/MyAssignmentPage'
 
 function App() {
   return (
-    <>
-      <AppBadge label="Java" variant="skill" />
-      <AppBadge label="PR 01" variant="project" />
-      <AppBadge label="DevOps" variant="muted" />
-      <Workload value={59} max={100} />
-    </>
+    <Routes>
+      <Route path="/" element={<Navigate to="/employees" replace />} />
+      <Route path="/employees" element={<EmployeesPage />} />
+      <Route path="/projects" element={<ProjectsPage />} />
+      <Route path="/my-assignment" element={<MyAssignmentPage />} />
+    </Routes>
   )
 }
 
