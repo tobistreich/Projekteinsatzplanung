@@ -1,8 +1,8 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
-import NavBar from './components/NavBar'
-import EmployeesPage from './pages/EmployeesPage'
-import ProjectsPage from './pages/ProjectsPage'
-import MyAssignmentPage from './pages/MyAssignmentPage'
+import { Navigate, Route, Routes } from 'react-router-dom';
+import NavBar from './components/NavBar';
+import EmployeesPage from './pages/EmployeesPage';
+import ProjectsPage from './pages/ProjectsPage';
+import MyAssignmentPage from './pages/MyAssignmentPage';
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
         <Route path="/my-assignment" element={<MyAssignmentPage />} />
       </Routes>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

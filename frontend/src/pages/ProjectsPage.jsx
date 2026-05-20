@@ -3,5 +3,5 @@ export default function ProjectsPage() {
     <div className="p-6">
       <h1 className="text-2xl font-semibold">Projektübersicht</h1>
     </div>
-  )
+  );
 }
