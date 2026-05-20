@@ -1,6 +1,8 @@
 import AppBadge from '@/components/AppBadge';
 import Workload from '@/components/Workload';
 import { Button } from '@/components/ui/button';
+import { Fragment, useState, useEffect } from "react"
+
 import {
   Table,
   TableHeader,
@@ -10,60 +12,23 @@ import {
   TableCell,
 } from '@/components/ui/table.jsx';
 
-const employees = [
-  {
-    name: 'Tobi Streich',
-    team: 'DCD',
-    skills: ['React', 'C#', 'Java', 'SQL'],
-    auslastung: 30,
-    faktura: 0,
-    intern: 30,
-    projekte: ['Projekteinsatzplanung'],
-  },
-  {
-    name: 'Jonny Do',
-    team: 'DCD',
-    skills: ['Roblox', 'C#', 'Unity'],
-    auslastung: 75,
-    faktura: 60,
-    intern: 15,
-    projekte: ['Projekt Alpha', 'Projekt Beta'],
-  },
-  {
-    name: 'Rainer Winkler',
-    team: 'Personal',
-    skills: ['Forza', 'Meddler', 'Drachenlord'],
-    auslastung: 50,
-    faktura: 30,
-    intern: 20,
-    projekte: ['Projekt Brot'],
-  },
-  {
-    name: 'Max Müller',
-    team: 'AngryNerds',
-    skills: ['Angular', 'C#'],
-    auslastung: 80,
-    faktura: 70,
-    intern: 10,
-    projekte: ['Projekt Delta'],
-  },
-  {
-    name: 'Lisa Weber',
-    team: 'AngryNerds',
-    skills: ['DevOps', 'Kubernetes'],
-    auslastung: 30,
-    faktura: 0,
-    intern: 30,
-    projekte: [],
-  },
-];
-
-const grouped = employees.reduce((acc, e) => {
-  (acc[e.team] ??= []).push(e);
-  return acc;
-}, {});
-
 export default function EmployeesPage() {
+    const [employees, setEmployees] = useState([])
+
+    function loadEmployees() {
+        fetch("/api/employees")
+            .then(res => res.json())
+            .then(data => setEmployees(data))
+    }
+
+    useEffect(() => {
+        loadEmployees()
+    }, [])
+
+    const grouped = employees.reduce((acc, e) => {
+        (acc[e.team.name] ??= []).push(e);
+        return acc;
+    }, {});
   return (
     <div className="p-6">
       <h1 className="text-2xl font-semibold mb-4">Mitarbeiterübersicht</h1>
@@ -82,40 +47,40 @@ export default function EmployeesPage() {
         </TableHeader>
         <TableBody>
           {Object.entries(grouped).map(([team, members]) => (
-            <>
-              <TableRow key={team} className="hover:bg-transparent">
+            <Fragment key={team}>
+              <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={5} className="py-2 text-left">
                   <AppBadge label={team} variant="team" />
                 </TableCell>
               </TableRow>
               {members.map((e) => (
-                <TableRow key={e.name}>
+                <TableRow key={e.id}>
                   <TableCell>
-                    <Button variant="outline">{e.name}</Button>
+                    <Button variant="outline">{e.firstName} {e.lastName}</Button>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
                       {e.skills.map((s) => (
-                        <AppBadge key={s} label={s} variant="skill" />
+                        <AppBadge key={s.id} label={s.name} variant="skill" />
                       ))}
                     </div>
                   </TableCell>
                   <TableCell className="min-w-32">
-                    <Workload value={e.auslastung} max={100} />
+                    <Workload value={e.availabilityPercent} max={100} />
                   </TableCell>
                   <TableCell className="text-sm tabular-nums">
-                    {e.faktura}% / {e.intern}%
+                    {e.billablePercent ?? 0}%
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {e.projekte.map((p) => (
-                        <AppBadge key={p} label={p} variant="project" />
+                      {(e.projects ?? []).map((p) => (
+                        <AppBadge key={p.id} label={p.title} variant="project" />
                       ))}
                     </div>
                   </TableCell>
                 </TableRow>
               ))}
-            </>
+            </Fragment>
           ))}
         </TableBody>
       </Table>

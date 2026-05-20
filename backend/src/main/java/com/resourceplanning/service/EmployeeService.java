@@ -1,12 +1,16 @@
 package com.resourceplanning.service;
 
 import com.resourceplanning.dto.*;
+import com.resourceplanning.entity.Assignment;
 import com.resourceplanning.entity.Employee;
 import com.resourceplanning.entity.Skill;
 import com.resourceplanning.entity.Team;
+import com.resourceplanning.repository.AssignmentRepository;
 import com.resourceplanning.repository.EmployeeRepository;
 import com.resourceplanning.repository.SkillRepository;
 import com.resourceplanning.repository.TeamRepository;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -25,6 +29,9 @@ public class EmployeeService {
 
     @Inject
     SkillRepository skillRepository;
+
+    @Inject
+    AssignmentRepository assignmentRepository;
 
     @Transactional
     public List<EmployeeDto> getAll() {
@@ -99,13 +106,47 @@ public class EmployeeService {
         List<SkillDto> skills = employee.getSkills().stream()
                 .map(s -> SkillDto.builder().id(s.getId()).name(s.getName()).build())
                 .toList();
+
+        LocalDate monthStart = YearMonth.now().atDay(1);
+        LocalDate monthEnd = YearMonth.now().atEndOfMonth();
+
+        List<Assignment> activeAssignments = assignmentRepository.findByEmployeeId(employee.getId())
+                .stream()
+                .filter(a -> !a.getStartDate().isAfter(monthEnd) && !a.getEndDate().isBefore(monthStart))
+                .toList();
+
+        int totalAllocated = activeAssignments.stream()
+                .mapToInt(a -> a.getAllocationHoursPerMonth() != null ? a.getAllocationHoursPerMonth() : 0)
+                .sum();
+        int billableAllocated = activeAssignments.stream()
+                .filter(a -> Boolean.TRUE.equals(a.getBillable()))
+                .mapToInt(a -> a.getAllocationHoursPerMonth() != null ? a.getAllocationHoursPerMonth() : 0)
+                .sum();
+
+        Integer availabilityPercent = (employee.getMonthlyCapacityHours() != null && employee.getMonthlyCapacityHours() > 0)
+                ? Math.min((totalAllocated * 100) / employee.getMonthlyCapacityHours(), 100)
+                : 0;
+        Integer billablePercent = totalAllocated > 0
+                ? (billableAllocated * 100) / totalAllocated
+                : 0;
+
+        List<ProjectSummaryDto> projects = activeAssignments.stream()
+                .map(a -> ProjectSummaryDto.builder()
+                        .id(a.getProject().getId())
+                        .title(a.getProject().getTitle())
+                        .status(a.getProject().getStatus())
+                        .build())
+                .toList();
+
         return EmployeeDto.builder()
                 .id(employee.getId())
                 .firstName(employee.getFirstName())
                 .lastName(employee.getLastName())
                 .jobTitle(employee.getJobTitle())
                 .monthlyCapacityHours(employee.getMonthlyCapacityHours())
-                .availabilityPercent(null)
+                .availabilityPercent(availabilityPercent)
+                .billablePercent(billablePercent)
+                .projects(projects)
                 .skills(skills)
                 .team(teamDto)
                 .build();

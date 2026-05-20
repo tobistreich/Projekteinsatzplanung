@@ -17,6 +17,8 @@ public class EmployeeDto {
     private String jobTitle;
     private Integer monthlyCapacityHours;
     private Integer availabilityPercent;
+    private Integer billablePercent;
+    private List<ProjectSummaryDto> projects;
     private List<SkillDto> skills;
     private TeamSummaryDto team;
 }
