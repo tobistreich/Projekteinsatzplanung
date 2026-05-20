@@ -6,7 +6,7 @@ import MyAssignmentPage from './pages/MyAssignmentPage';
 
 function App() {
   return (
-    <div className="w-full bg-background">
+    <div className="mx-auto w-[85%] bg-background">
       <NavBar />
       <Routes>
         <Route path="/" element={<Navigate to="/employees" replace />} />
