@@ -1,6 +1,6 @@
-import AppBadge from "@/components/AppBadge";
-import Workload from "@/components/Workload";
-import { Button } from "@/components/ui/button";
+import AppBadge from '@/components/AppBadge';
+import Workload from '@/components/Workload';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableHeader,
@@ -8,49 +8,49 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from "@/components/ui/table.jsx";
+} from '@/components/ui/table.jsx';
 
 const employees = [
   {
-    name: "Tobi Streich",
-    team: "DCD",
-    skills: ["React", "C#", "Java", "SQL"],
+    name: 'Tobi Streich',
+    team: 'DCD',
+    skills: ['React', 'C#', 'Java', 'SQL'],
     auslastung: 30,
     faktura: 0,
     intern: 30,
-    projekte: ["Projekteinsatzplanung"],
+    projekte: ['Projekteinsatzplanung'],
   },
   {
-    name: "Jonny Do",
-    team: "DCD",
-    skills: ["Roblox", "C#", "Unity"],
+    name: 'Jonny Do',
+    team: 'DCD',
+    skills: ['Roblox', 'C#', 'Unity'],
     auslastung: 75,
     faktura: 60,
     intern: 15,
-    projekte: ["Projekt Alpha", "Projekt Beta"],
+    projekte: ['Projekt Alpha', 'Projekt Beta'],
   },
   {
-    name: "Rainer Winkler",
-    team: "Personal",
-    skills: ["Forza", "Meddler", "Drachenlord"],
+    name: 'Rainer Winkler',
+    team: 'Personal',
+    skills: ['Forza', 'Meddler', 'Drachenlord'],
     auslastung: 50,
     faktura: 30,
     intern: 20,
-    projekte: ["Projekt Brot"],
+    projekte: ['Projekt Brot'],
   },
   {
-    name: "Max Müller",
-    team: "AngryNerds",
-    skills: ["Angular", "C#"],
+    name: 'Max Müller',
+    team: 'AngryNerds',
+    skills: ['Angular', 'C#'],
     auslastung: 80,
     faktura: 70,
     intern: 10,
-    projekte: ["Projekt Delta"],
+    projekte: ['Projekt Delta'],
   },
   {
-    name: "Lisa Weber",
-    team: "AngryNerds",
-    skills: ["DevOps", "Kubernetes"],
+    name: 'Lisa Weber',
+    team: 'AngryNerds',
+    skills: ['DevOps', 'Kubernetes'],
     auslastung: 30,
     faktura: 0,
     intern: 30,
@@ -90,7 +90,9 @@ export default function EmployeesPage() {
               </TableRow>
               {members.map((e) => (
                 <TableRow key={e.name}>
-                  <TableCell><Button variant="outline">{e.name}</Button></TableCell>
+                  <TableCell>
+                    <Button variant="outline">{e.name}</Button>
+                  </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
                       {e.skills.map((s) => (
