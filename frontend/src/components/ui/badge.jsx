@@ -12,6 +12,7 @@ const badgeVariants = cva(
         default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
         secondary:
           "bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80",
+        skill: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
         project:
           "bg-blue-100 text-blue-800 [a]:hover:bg-blue-200 [a]:hover:text-blue-900",
         destructive:
