@@ -1,6 +1,11 @@
+import SkillBadge from "@/components/SkillBadge"
+
 function App() {
   return (
-    <h1> Hallo Welt</h1>
+    <>
+      <SkillBadge label="DevOps" variant="default" /> {/* default → blau */}
+      <SkillBadge label="Ausgegraut" variant="outline" /> {/* ausgegraut */}
+    </>
   )
 }
 
