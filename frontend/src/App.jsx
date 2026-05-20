@@ -5,7 +5,7 @@ function App() {
   return (
     <>
       <SkillBadge label="DevOps" variant="default" /> {/* default → blau */}
-      <SkillBadge label="Ausgegraut" variant="outline" /> {/* ausgegraut */}
+      <SkillBadge label="Ausgegraut" variant="disabled" /> {/* ausgegraut */}
       <Workload value={59} max={100} />
     </>
   )
