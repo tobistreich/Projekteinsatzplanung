@@ -1,6 +1,7 @@
 import AppBadge from '@/components/AppBadge';
 import Workload from '@/components/Workload';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Fragment, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,14 +14,39 @@ import {
   TableCell,
 } from '@/components/ui/table.jsx';
 
+function EmployeeRowSkeleton() {
+  return (
+    <TableRow>
+      <TableCell><Skeleton className="h-8 w-36 rounded-md" /></TableCell>
+      <TableCell>
+        <div className="flex gap-1">
+          <Skeleton className="h-5 w-14 rounded-full" />
+          <Skeleton className="h-5 w-14 rounded-full" />
+          <Skeleton className="h-5 w-14 rounded-full" />
+        </div>
+      </TableCell>
+      <TableCell className="min-w-32"><Skeleton className="h-3 w-full rounded-full" /></TableCell>
+      <TableCell><Skeleton className="h-4 w-10" /></TableCell>
+      <TableCell>
+        <div className="flex gap-1">
+          <Skeleton className="h-5 w-20 rounded-full" />
+          <Skeleton className="h-5 w-20 rounded-full" />
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}
+
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   function loadEmployees() {
     fetch('/api/employees')
       .then((res) => res.json())
-      .then((data) => setEmployees(data));
+      .then((data) => setEmployees(data))
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -48,42 +74,44 @@ export default function EmployeesPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {Object.entries(grouped).map(([team, members]) => (
-            <Fragment key={team}>
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={5} className="py-2 text-left">
-                  <AppBadge label={`${team} Team`} variant="team" />
-                </TableCell>
-              </TableRow>
-              {members.map((e) => (
-                <TableRow key={e.id}>
-                  <TableCell>
-                    <Button variant="outline" onClick={() => navigate(`/employee-details/${e.id}`)}>
-                      {e.firstName} {e.lastName}
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {e.skills.map((s) => (
-                        <AppBadge key={s.id} label={s.name} variant="skill" />
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell className="min-w-32">
-                    <Workload value={e.availabilityPercent} max={100} />
-                  </TableCell>
-                  <TableCell className="text-sm tabular-nums">{e.billablePercent ?? 0}%</TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {(e.projects ?? []).map((p) => (
-                        <AppBadge key={p.id} label={p.title} variant="project" />
-                      ))}
-                    </div>
-                  </TableCell>
-                </TableRow>
+          {loading
+            ? Array.from({ length: 6 }).map((_, i) => <EmployeeRowSkeleton key={i} />)
+            : Object.entries(grouped).map(([team, members]) => (
+                <Fragment key={team}>
+                  <TableRow className="hover:bg-transparent">
+                    <TableCell colSpan={5} className="py-2 text-left">
+                      <AppBadge label={`${team} Team`} variant="team" />
+                    </TableCell>
+                  </TableRow>
+                  {members.map((e) => (
+                    <TableRow key={e.id}>
+                      <TableCell>
+                        <Button variant="outline" onClick={() => navigate(`/employee-details/${e.id}`)}>
+                          {e.firstName} {e.lastName}
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {e.skills.map((s) => (
+                            <AppBadge key={s.id} label={s.name} variant="skill" />
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell className="min-w-32">
+                        <Workload value={e.availabilityPercent} max={100} />
+                      </TableCell>
+                      <TableCell className="text-sm tabular-nums">{e.billablePercent ?? 0}%</TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {(e.projects ?? []).map((p) => (
+                            <AppBadge key={p.id} label={p.title} variant="project" />
+                          ))}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </Fragment>
               ))}
-            </Fragment>
-          ))}
         </TableBody>
       </Table>
     </div>

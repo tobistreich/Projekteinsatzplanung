@@ -1,6 +1,7 @@
 import AppBadge from '@/components/AppBadge';
 import AddSkillDialog from '@/components/AddSkillDialog';
 import ProjectCard from '@/components/ProjectCard';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,67 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import Workload from '@/components/Workload';
+
+function EmployeeDetailsSkeleton() {
+  return (
+    <div className="m-4 space-y-4">
+      <div className="flex items-start gap-4">
+        <Skeleton className="h-20 w-20 shrink-0 rounded-full" />
+        <div className="space-y-2 flex-1">
+          <div className="flex gap-2">
+            <Skeleton className="h-9 w-36" />
+            <Skeleton className="h-9 w-36" />
+          </div>
+          <Skeleton className="h-9 w-52" />
+          <Skeleton className="h-5 w-24 rounded-full" />
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Card key={i} className="outline-solid outline-3">
+            <CardContent className="pt-6 space-y-3">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-3 w-32" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-4 w-12" />
+          <Skeleton className="h-8 w-32 rounded-md" />
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-5 w-16 rounded-full" />
+          ))}
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-28" />
+        {Array.from({ length: 2 }).map((_, i) => (
+          <Card key={i} className="outline-solid outline-3">
+            <CardContent className="flex items-center justify-between pb-4 pt-4">
+              <div className="space-y-2 flex-1">
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-3 w-24" />
+                <div className="flex gap-1">
+                  <Skeleton className="h-5 w-14 rounded-full" />
+                  <Skeleton className="h-5 w-14 rounded-full" />
+                </div>
+              </div>
+              <div className="space-y-1 text-right">
+                <Skeleton className="h-8 w-16 ml-auto" />
+                <Skeleton className="h-3 w-20 ml-auto" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function EmployeeDetailsPage() {
   const { id } = useParams();
@@ -34,7 +96,7 @@ export default function EmployeeDetailsPage() {
       <Button className="flex justify-start" onClick={() => navigate(`/employees`)}>
         Zurück zur Übersicht
       </Button>
-      {employee && (
+      {!employee ? <EmployeeDetailsSkeleton /> : (
         <div className="m-4 space-y-4">
           <div className="flex items-start gap-4">
             <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-olive-400 text-2xl font-semibold text-white">
@@ -137,7 +199,7 @@ export default function EmployeeDetailsPage() {
               <span>
                 {100 - (employee.availabilityPercent ?? 0)}%
                 {' · '}
-                {(employee.monthlyCapacityHours ?? 0) - (employee.allocatedHours ?? 0)} h
+                {(employee.monthlyCapacityHours ?? 0) - (employee.allocatedHours ?? 0)} h / Monat
               </span>
             </div>
           </div>
