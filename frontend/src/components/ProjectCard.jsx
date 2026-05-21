@@ -21,7 +21,8 @@ export default function ProjectCard({ title, status, skills, allocationPercent, 
     <Card className="outline-solid outline-3">
       <CardContent className="flex items-center justify-between pb-4 pt-4">
         <div>
-          <p className="font-medium">{title}</p>
+          <AppBadge variant="project" label={title} className="mb-1 text-lg font-semibold">
+          </AppBadge>
           <p className={`text-sm ${statusColor}`}>Status: {statusLabel}</p>
           <div className="mt-1 flex flex-wrap gap-1">
             {(skills ?? []).map((s) => (
