@@ -4,6 +4,8 @@ import com.resourceplanning.entity.ProjectStatus;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,4 +15,8 @@ public class ProjectSummaryDto {
     private Long id;
     private String title;
     private ProjectStatus status;
+    private List<SkillDto> skills;
+    private Integer allocationPercent;
+    private Integer allocationHoursPerMonth;
+    private Boolean billable;
 }

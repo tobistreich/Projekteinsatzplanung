@@ -1,5 +1,6 @@
 import AppBadge from '@/components/AppBadge';
 import AddSkillDialog from '@/components/AddSkillDialog';
+import ProjectCard from '@/components/ProjectCard';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -69,18 +70,27 @@ export default function EmployeeDetailsPage() {
               <CardContent className="pt-6">
                 <h2 className="mb-4">Auslastung</h2>
                 <Workload className="m-8 p-8" value={employee.availabilityPercent} max={100} />
+                <p className="mt-2 text-center font-medium">
+                  {employee.allocatedHours ?? 0} / {employee.monthlyCapacityHours ?? 0} h des Monats verplant
+                </p>
               </CardContent>
             </Card>
             <Card className="outline-solid outline-3">
               <CardContent className="pt-6">
                 <h2 className="mb-4">Faktura</h2>
-                {employee.billablePercent ?? 0}%
+                <p className="text-2xl font-bold">{employee.billablePercent ?? 0}%</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {employee.billableAllocatedHours ?? 0} h fakturierbar
+                </p>
               </CardContent>
             </Card>
             <Card className="outline-solid outline-3">
               <CardContent className="pt-6">
                 <h2 className="mb-4">Intern</h2>
-                {employee.internalPercent ?? 0}%
+                <p className="text-2xl font-bold">{employee.internalPercent ?? 0}%</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {employee.internalAllocatedHours ?? 0} h intern
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -106,6 +116,30 @@ export default function EmployeeDetailsPage() {
                 setDialogOpen(false);
               }}
             />
+          </div>
+          <div>
+            <span className="mb-2 text-sm font-medium">Aktive Projekte</span>
+            <div className="space-y-2">
+              {(employee.projects ?? []).map((p) => (
+                <ProjectCard
+                  key={p.id}
+                  title={p.title}
+                  status={p.status}
+                  skills={p.skills}
+                  allocationPercent={p.allocationPercent}
+                  allocationHoursPerMonth={p.allocationHoursPerMonth}
+                  billable={p.billable}
+                />
+              ))}
+            </div>
+            <div className="mt-2 flex justify-between text-sm font-medium">
+              <span>Verbleibende freie Kapazität</span>
+              <span>
+                {100 - (employee.availabilityPercent ?? 0)}%
+                {' · '}
+                {(employee.monthlyCapacityHours ?? 0) - (employee.allocatedHours ?? 0)} h
+              </span>
+            </div>
           </div>
         </div>
       )}

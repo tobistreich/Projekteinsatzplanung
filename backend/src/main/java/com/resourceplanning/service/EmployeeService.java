@@ -138,11 +138,23 @@ public class EmployeeService {
                 : 0;
 
         List<ProjectSummaryDto> projects = activeAssignments.stream()
-                .map(a -> ProjectSummaryDto.builder()
-                        .id(a.getProject().getId())
-                        .title(a.getProject().getTitle())
-                        .status(a.getProject().getStatus())
-                        .build())
+                .map(a -> {
+                    int allocPercent = (employee.getMonthlyCapacityHours() != null && employee.getMonthlyCapacityHours() > 0)
+                            ? (a.getAllocationHoursPerMonth() != null ? (a.getAllocationHoursPerMonth() * 100) / employee.getMonthlyCapacityHours() : 0)
+                            : 0;
+                    List<SkillDto> projectSkills = a.getProject().getSkills().stream()
+                            .map(s -> SkillDto.builder().id(s.getId()).name(s.getName()).build())
+                            .toList();
+                    return ProjectSummaryDto.builder()
+                            .id(a.getProject().getId())
+                            .title(a.getProject().getTitle())
+                            .status(a.getProject().getStatus())
+                            .skills(projectSkills)
+                            .allocationPercent(allocPercent)
+                            .allocationHoursPerMonth(a.getAllocationHoursPerMonth())
+                            .billable(a.getBillable())
+                            .build();
+                })
                 .toList();
 
         return EmployeeDto.builder()
@@ -152,8 +164,11 @@ public class EmployeeService {
                 .jobTitle(employee.getJobTitle())
                 .monthlyCapacityHours(employee.getMonthlyCapacityHours())
                 .availabilityPercent(availabilityPercent)
+                .allocatedHours(totalAllocated)
                 .billablePercent(billablePercent)
+                .billableAllocatedHours(billableAllocated)
                 .internalPercent(internalPercent)
+                .internalAllocatedHours(internalAllocated)
                 .projects(projects)
                 .skills(skills)
                 .team(teamDto)
