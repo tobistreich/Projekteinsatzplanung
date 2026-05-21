@@ -83,7 +83,7 @@ export default function EmployeeDetailsPage() {
             <Card className="outline-solid outline-3">
               <CardContent className="pt-6">
                 <h2 className="mb-4">Intern</h2>
-                {100 - (employee.billablePercent ?? 0)}%
+                {employee.internalPercent ?? 0}%d
               </CardContent>
             </Card>
           </div>

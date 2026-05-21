@@ -122,12 +122,19 @@ public class EmployeeService {
                 .filter(a -> Boolean.TRUE.equals(a.getBillable()))
                 .mapToInt(a -> a.getAllocationHoursPerMonth() != null ? a.getAllocationHoursPerMonth() : 0)
                 .sum();
+        int internalAllocated = activeAssignments.stream()
+                .filter(a -> !Boolean.TRUE.equals(a.getBillable()))
+                .mapToInt(a -> a.getAllocationHoursPerMonth() != null ? a.getAllocationHoursPerMonth() : 0)
+                .sum();
 
         Integer availabilityPercent = (employee.getMonthlyCapacityHours() != null && employee.getMonthlyCapacityHours() > 0)
                 ? Math.min((totalAllocated * 100) / employee.getMonthlyCapacityHours(), 100)
                 : 0;
         Integer billablePercent = totalAllocated > 0
                 ? (billableAllocated * 100) / totalAllocated
+                : 0;
+        Integer internalPercent = totalAllocated > 0
+                ? (internalAllocated * 100) / totalAllocated
                 : 0;
 
         List<ProjectSummaryDto> projects = activeAssignments.stream()
@@ -146,6 +153,7 @@ public class EmployeeService {
                 .monthlyCapacityHours(employee.getMonthlyCapacityHours())
                 .availabilityPercent(availabilityPercent)
                 .billablePercent(billablePercent)
+                .internalPercent(internalPercent)
                 .projects(projects)
                 .skills(skills)
                 .team(teamDto)

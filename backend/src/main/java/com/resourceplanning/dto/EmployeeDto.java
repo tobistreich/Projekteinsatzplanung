@@ -18,6 +18,7 @@ public class EmployeeDto {
     private Integer monthlyCapacityHours;
     private Integer availabilityPercent;
     private Integer billablePercent;
+    private Integer internalPercent;
     private List<ProjectSummaryDto> projects;
     private List<SkillDto> skills;
     private TeamSummaryDto team;
