@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 const links = [
   { to: '/employees', label: 'Mitarbeiter' },
   { to: '/projects', label: 'Projekte' },
-  { to: '/my-assignment', label: 'Mein Einsatz' },
+  { to: '/employee-details/1', label: 'Mitarbeiterdetailansicht' },
 ];
 
 function NavItem({ to, label }) {
