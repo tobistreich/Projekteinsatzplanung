@@ -23,6 +23,9 @@ const badgeVariants = cva(
           "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
         link: "text-primary underline-offset-4 hover:underline",
         team: "bg-violet-100 text-violet-800 outline-solid [a]:hover:bg-violet-200",
+        "status-active": "bg-green-100 text-green-800 outline-solid [a]:hover:bg-green-200",
+        "status-planned": "bg-orange-100 text-orange-800 outline-solid [a]:hover:bg-orange-200",
+        "status-done": "bg-purple-100 text-purple-800 outline-solid [a]:hover:bg-purple-200",
       },
     },
     defaultVariants: {

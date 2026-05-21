@@ -7,24 +7,25 @@ const STATUS_LABELS = {
   DONE: 'Abgeschlossen',
 };
 
-const STATUS_COLORS = {
-  ACTIVE: 'text-green-600',
-  PLANNED: 'text-yellow-600',
-  DONE: 'text-gray-500',
+const STATUS_VARIANTS = {
+  ACTIVE: 'status-active',
+  PLANNED: 'status-planned',
+  DONE: 'status-done',
 };
 
 export default function ProjectCard({ title, status, skills, allocationPercent, allocationHoursPerMonth, billable }) {
   const statusLabel = STATUS_LABELS[status] ?? status;
-  const statusColor = STATUS_COLORS[status] ?? 'text-gray-600';
+  const statusVariant = STATUS_VARIANTS[status] ?? 'secondary';
 
   return (
     <Card className="outline-solid outline-3">
       <CardContent className="flex items-center justify-between pb-4 pt-4">
         <div>
-          <AppBadge variant="project" label={title} className="mb-1 text-lg font-semibold">
-          </AppBadge>
-          <p className={`text-sm ${statusColor}`}>Status: {statusLabel}</p>
-          <div className="mt-1 flex flex-wrap gap-1">
+          <div className="flex items-center gap-4 my-1">
+            <AppBadge variant="project" label={title} className="text-lg font-semibold" />
+            <AppBadge variant={statusVariant} label={statusLabel} />
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2">
             {(skills ?? []).map((s) => (
               <AppBadge key={s.id} label={s.name} variant="skill" />
             ))}
