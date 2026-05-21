@@ -1,4 +1,5 @@
 import AppBadge from '@/components/AppBadge';
+import AddSkillDialog from '@/components/AddSkillDialog';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ export default function EmployeeDetailsPage() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -60,11 +62,6 @@ export default function EmployeeDetailsPage() {
               <div className="mt-2 flex">
                 <AppBadge label={`${employee.team.name} Team`} variant="team" />
               </div>
-              <div className="mt-2 flex flex-wrap gap-1">
-                {employee.skills.map((s) => (
-                  <AppBadge key={s.id} label={s.name} variant="skill" />
-                ))}
-              </div>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4">
@@ -83,9 +80,32 @@ export default function EmployeeDetailsPage() {
             <Card className="outline-solid outline-3">
               <CardContent className="pt-6">
                 <h2 className="mb-4">Intern</h2>
-                {employee.internalPercent ?? 0}%d
+                {employee.internalPercent ?? 0}%
               </CardContent>
             </Card>
+          </div>
+          <div>
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-sm font-medium">Skills</span>
+              <Button variant="outline" size="sm" onClick={() => setDialogOpen(true)}>
+                Skills hinzufügen
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {employee.skills.map((s) => (
+                <AppBadge key={s.id} label={s.name} variant="skill" />
+              ))}
+            </div>
+            <AddSkillDialog
+              open={dialogOpen}
+              onOpenChange={setDialogOpen}
+              employeeId={id}
+              currentSkills={employee.skills}
+              onSkillAdded={(updatedSkills) => {
+                setEmployee((prev) => ({ ...prev, skills: updatedSkills }));
+                setDialogOpen(false);
+              }}
+            />
           </div>
         </div>
       )}
