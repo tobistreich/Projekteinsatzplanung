@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 
-export default function AddSkillDialog({ open, onOpenChange, employeeId, currentSkills, onSkillAdded }) {
+export default function AddSkillDialog({
+  open,
+  onOpenChange,
+  employeeId,
+  currentSkills,
+  onSkillAdded,
+}) {
   const [query, setQuery] = useState('');
   const [allSkills, setAllSkills] = useState([]);
 
@@ -24,15 +25,11 @@ export default function AddSkillDialog({ open, onOpenChange, employeeId, current
   const currentSkillIds = new Set(currentSkills.map((s) => s.id));
 
   const filteredSkills = allSkills.filter(
-    (s) =>
-      !currentSkillIds.has(s.id) &&
-      s.name.toLowerCase().includes(query.toLowerCase()),
+    (s) => !currentSkillIds.has(s.id) && s.name.toLowerCase().includes(query.toLowerCase())
   );
 
   const trimmed = query.trim();
-  const exactMatch = allSkills.some(
-    (s) => s.name.toLowerCase() === trimmed.toLowerCase(),
-  );
+  const exactMatch = allSkills.some((s) => s.name.toLowerCase() === trimmed.toLowerCase());
   const showCreateOption = trimmed.length > 0 && !exactMatch;
 
   async function assignSkill(skillId, newSkillObj) {

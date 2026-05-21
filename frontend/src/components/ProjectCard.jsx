@@ -13,7 +13,14 @@ const STATUS_VARIANTS = {
   DONE: 'status-done',
 };
 
-export default function ProjectCard({ title, status, skills, allocationPercent, allocationHoursPerMonth, billable }) {
+export default function ProjectCard({
+  title,
+  status,
+  skills,
+  allocationPercent,
+  allocationHoursPerMonth,
+  billable,
+}) {
   const statusLabel = STATUS_LABELS[status] ?? status;
   const statusVariant = STATUS_VARIANTS[status] ?? 'secondary';
 
@@ -37,9 +44,7 @@ export default function ProjectCard({ title, status, skills, allocationPercent, 
             {allocationHoursPerMonth != null && (
               <p className="text-sm font-medium">{allocationHoursPerMonth} h / Monat</p>
             )}
-            <p className="text-sm text-muted-foreground">
-              {billable ? 'Fakturierbar' : 'Intern'}
-            </p>
+            <p className="text-sm text-muted-foreground">{billable ? 'Fakturierbar' : 'Intern'}</p>
           </div>
         )}
       </CardContent>

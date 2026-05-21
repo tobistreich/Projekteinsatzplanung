@@ -17,7 +17,9 @@ import {
 function EmployeeRowSkeleton() {
   return (
     <TableRow>
-      <TableCell><Skeleton className="h-8 w-36 rounded-md" /></TableCell>
+      <TableCell>
+        <Skeleton className="h-8 w-36 rounded-md" />
+      </TableCell>
       <TableCell>
         <div className="flex gap-1">
           <Skeleton className="h-5 w-14 rounded-full" />
@@ -25,8 +27,12 @@ function EmployeeRowSkeleton() {
           <Skeleton className="h-5 w-14 rounded-full" />
         </div>
       </TableCell>
-      <TableCell className="min-w-32"><Skeleton className="h-3 w-full rounded-full" /></TableCell>
-      <TableCell><Skeleton className="h-4 w-10" /></TableCell>
+      <TableCell className="min-w-32">
+        <Skeleton className="h-3 w-full rounded-full" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="h-4 w-10" />
+      </TableCell>
       <TableCell>
         <div className="flex gap-1">
           <Skeleton className="h-5 w-20 rounded-full" />
@@ -86,7 +92,10 @@ export default function EmployeesPage() {
                   {members.map((e) => (
                     <TableRow key={e.id}>
                       <TableCell>
-                        <Button variant="outline" onClick={() => navigate(`/employee-details/${e.id}`)}>
+                        <Button
+                          variant="outline"
+                          onClick={() => navigate(`/employee-details/${e.id}`)}
+                        >
                           {e.firstName} {e.lastName}
                         </Button>
                       </TableCell>
@@ -100,7 +109,9 @@ export default function EmployeesPage() {
                       <TableCell className="min-w-32">
                         <Workload value={e.availabilityPercent} max={100} />
                       </TableCell>
-                      <TableCell className="text-sm tabular-nums">{e.billablePercent ?? 0}%</TableCell>
+                      <TableCell className="text-sm tabular-nums">
+                        {e.billablePercent ?? 0}%
+                      </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {(e.projects ?? []).map((p) => (

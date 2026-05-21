@@ -96,7 +96,9 @@ export default function EmployeeDetailsPage() {
       <Button className="flex justify-start" onClick={() => navigate(`/employees`)}>
         Zurück zur Übersicht
       </Button>
-      {!employee ? <EmployeeDetailsSkeleton /> : (
+      {!employee ? (
+        <EmployeeDetailsSkeleton />
+      ) : (
         <div className="m-4 space-y-4">
           <div className="flex items-start gap-4">
             <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-olive-400 text-2xl font-semibold text-white">
@@ -133,7 +135,8 @@ export default function EmployeeDetailsPage() {
                 <h2 className="mb-4">Auslastung</h2>
                 <Workload className="m-8 p-8" value={employee.availabilityPercent} max={100} />
                 <p className="mt-2 text-center font-medium">
-                  {employee.allocatedHours ?? 0} / {employee.monthlyCapacityHours ?? 0} h des Monats verplant
+                  {employee.allocatedHours ?? 0} / {employee.monthlyCapacityHours ?? 0} h des Monats
+                  verplant
                 </p>
               </CardContent>
             </Card>
@@ -197,8 +200,7 @@ export default function EmployeeDetailsPage() {
             <div className="mt-2 flex justify-between text-sm font-medium">
               <span>Verbleibende freie Kapazität</span>
               <span>
-                {100 - (employee.availabilityPercent ?? 0)}%
-                {' · '}
+                {100 - (employee.availabilityPercent ?? 0)}%{' · '}
                 {(employee.monthlyCapacityHours ?? 0) - (employee.allocatedHours ?? 0)} h / Monat
               </span>
             </div>
