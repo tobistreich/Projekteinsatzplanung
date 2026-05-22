@@ -194,6 +194,7 @@ export default function EmployeeDetailsPage() {
                   allocationPercent={p.allocationPercent}
                   allocationHoursPerMonth={p.allocationHoursPerMonth}
                   billable={p.billable}
+                  onClick={() => navigate(`/projects/${p.id}`)}
                 />
               ))}
             </div>

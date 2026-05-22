@@ -3,6 +3,7 @@ import AddProjectDialog from '@/components/AddProjectDialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { PlusCircleIcon } from 'lucide-react';
 
@@ -30,6 +31,7 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch('/api/projects')
@@ -58,7 +60,7 @@ export default function ProjectsPage() {
         {loading
           ? Array.from({ length: 4 }).map((_, i) => <ProjectCardSkeleton key={i} />)
           : projects.map((p) => (
-              <ProjectCard key={p.id} title={p.title} status={p.status} skills={p.skills} startDate={p.startDate} endDate={p.endDate} />
+              <ProjectCard key={p.id} title={p.title} status={p.status} skills={p.skills} startDate={p.startDate} endDate={p.endDate} onClick={() => navigate(`/projects/${p.id}`)} />
             ))}
       </div>
     </div>
