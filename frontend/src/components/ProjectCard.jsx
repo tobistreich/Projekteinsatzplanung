@@ -18,7 +18,10 @@ export default function ProjectCard({
   const statusVariant = STATUS_VARIANTS[status] ?? 'secondary';
 
   return (
-    <Card className="outline-solid outline-3 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-lg" onClick={onClick}>
+    <Card
+      className="outline-solid outline-3 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+      onClick={onClick}
+    >
       <CardContent className="flex items-center justify-between pb-4 pt-4">
         <div className="w-full">
           <div className="flex items-center gap-4 my-1">

@@ -172,11 +172,7 @@ export default function EmployeeDetailsPage() {
                 onBlur={handleBlur}
               />
               <div className="mt-2">
-                <TeamBadge
-                  team={employee.team}
-                  employeeId={id}
-                  onTeamChanged={setEmployee}
-                />
+                <TeamBadge team={employee.team} employeeId={id} onTeamChanged={setEmployee} />
               </div>
             </div>
           </div>

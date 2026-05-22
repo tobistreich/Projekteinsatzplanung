@@ -43,11 +43,7 @@ export default function ProjectsPage() {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-semibold">Projektübersicht</h1>
-      <Button
-        variant="primary"
-        className="p-5 bg-amber-600"
-        onClick={() => setDialogOpen(true)}
-      >
+      <Button variant="primary" className="p-5 bg-amber-600" onClick={() => setDialogOpen(true)}>
         <PlusCircleIcon />
         Projekt hinzufügen
       </Button>
@@ -60,7 +56,15 @@ export default function ProjectsPage() {
         {loading
           ? Array.from({ length: 4 }).map((_, i) => <ProjectCardSkeleton key={i} />)
           : projects.map((p) => (
-              <ProjectCard key={p.id} title={p.title} status={p.status} skills={p.skills} startDate={p.startDate} endDate={p.endDate} onClick={() => navigate(`/projects/${p.id}`)} />
+              <ProjectCard
+                key={p.id}
+                title={p.title}
+                status={p.status}
+                skills={p.skills}
+                startDate={p.startDate}
+                endDate={p.endDate}
+                onClick={() => navigate(`/projects/${p.id}`)}
+              />
             ))}
       </div>
     </div>

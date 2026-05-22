@@ -118,7 +118,10 @@ export default function AddEmployeeDialog({ open, onOpenChange, onEmployeeCreate
                 items={allTeams}
                 query={teamQuery}
                 onQueryChange={setTeamQuery}
-                onSelect={(team) => { setSelectedTeam(team); setTeamQuery(''); }}
+                onSelect={(team) => {
+                  setSelectedTeam(team);
+                  setTeamQuery('');
+                }}
                 onCreate={handleCreateTeam}
                 placeholder="Team suchen..."
                 createLabel="Team"

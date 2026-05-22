@@ -101,19 +101,11 @@ export default function AddProjectDialog({ open, onOpenChange, onProjectCreated 
           <div className="flex gap-2">
             <div className="flex-1">
               <label className="text-xs text-muted-foreground mb-1 block">Startdatum</label>
-              <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
+              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
             </div>
             <div className="flex-1">
               <label className="text-xs text-muted-foreground mb-1 block">Enddatum</label>
-              <Input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
+              <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
             </div>
           </div>
           <div>

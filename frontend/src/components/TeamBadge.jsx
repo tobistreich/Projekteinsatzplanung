@@ -52,7 +52,12 @@ export default function TeamBadge({ team, employeeId, onTeamChanged }) {
         <AppBadge label={`${team.name} Team`} variant="team" />
       </button>
 
-      <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose(); }}>
+      <Dialog
+        open={open}
+        onOpenChange={(v) => {
+          if (!v) handleClose();
+        }}
+      >
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Team ändern</DialogTitle>

@@ -74,7 +74,10 @@ export default function EmployeesPage() {
       <AddEmployeeDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        onEmployeeCreated={() => { setLoading(true); loadEmployees(); }}
+        onEmployeeCreated={() => {
+          setLoading(true);
+          loadEmployees();
+        }}
       />
       <Table>
         <TableHeader>
