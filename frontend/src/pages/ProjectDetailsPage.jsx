@@ -4,9 +4,7 @@ import AppBadge from '@/components/AppBadge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-
-const STATUS_LABELS = { ACTIVE: 'Aktiv', PLANNED: 'Geplant', DONE: 'Abgeschlossen' };
-const STATUS_VARIANTS = { ACTIVE: 'status-active', PLANNED: 'status-planned', DONE: 'status-done' };
+import { STATUS_LABELS, STATUS_VARIANTS } from '@/lib/projectStatus';
 
 function ProjectDetailsSkeleton() {
   return (

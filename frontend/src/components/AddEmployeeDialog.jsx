@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import AppBadge from '@/components/AppBadge';
+import SearchableList from '@/components/SearchableList';
 import { XIcon } from 'lucide-react';
 
 export default function AddEmployeeDialog({ open, onOpenChange, onEmployeeCreated }) {
@@ -30,12 +31,17 @@ export default function AddEmployeeDialog({ open, onOpenChange, onEmployeeCreate
       .then(setAllTeams);
   }, [open]);
 
-  const trimmedTeam = teamQuery.trim();
-  const filteredTeams = allTeams.filter(
-    (t) => !selectedTeam && t.name.toLowerCase().includes(trimmedTeam.toLowerCase())
-  );
-  const exactTeamMatch = allTeams.some((t) => t.name.toLowerCase() === trimmedTeam.toLowerCase());
-  const showCreateTeam = trimmedTeam.length > 0 && !exactTeamMatch && !selectedTeam;
+  async function handleCreateTeam(name) {
+    const res = await fetch('/api/teams', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    const newTeam = await res.json();
+    setAllTeams((prev) => [...prev, newTeam]);
+    setSelectedTeam(newTeam);
+    setTeamQuery('');
+  }
 
   const canSubmit = firstName.trim() && lastName.trim() && jobTitle.trim() && selectedTeam;
 
@@ -108,44 +114,16 @@ export default function AddEmployeeDialog({ open, onOpenChange, onEmployeeCreate
                 </button>
               </span>
             ) : (
-              <>
-                <Input
-                  placeholder="Team suchen..."
-                  value={teamQuery}
-                  onChange={(e) => setTeamQuery(e.target.value)}
-                />
-                {(filteredTeams.length > 0 || showCreateTeam) && (
-                  <div className="mt-1 max-h-40 overflow-y-auto border rounded-md">
-                    {filteredTeams.map((team) => (
-                      <button
-                        key={team.id}
-                        onClick={() => { setSelectedTeam(team); setTeamQuery(''); }}
-                        className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-muted"
-                      >
-                        {team.name}
-                      </button>
-                    ))}
-                    {showCreateTeam && (
-                      <button
-                        onClick={async () => {
-                          const res = await fetch('/api/teams', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ name: trimmedTeam }),
-                          });
-                          const newTeam = await res.json();
-                          setAllTeams((prev) => [...prev, newTeam]);
-                          setSelectedTeam(newTeam);
-                          setTeamQuery('');
-                        }}
-                        className="w-full rounded-md px-3 py-2 text-left text-sm text-primary hover:bg-muted"
-                      >
-                        + &ldquo;{trimmedTeam}&rdquo; als neues Team erstellen
-                      </button>
-                    )}
-                  </div>
-                )}
-              </>
+              <SearchableList
+                items={allTeams}
+                query={teamQuery}
+                onQueryChange={setTeamQuery}
+                onSelect={(team) => { setSelectedTeam(team); setTeamQuery(''); }}
+                onCreate={handleCreateTeam}
+                placeholder="Team suchen..."
+                createLabel="Team"
+                maxHeight="max-h-40"
+              />
             )}
           </div>
         </div>

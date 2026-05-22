@@ -1,14 +1,12 @@
-import AppBadge from '@/components/AppBadge';
-import AddSkillDialog from '@/components/AddSkillDialog';
 import ProjectCard from '@/components/ProjectCard';
+import SkillBadgeList from '@/components/SkillBadgeList';
+import TeamBadge from '@/components/TeamBadge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Workload from '@/components/Workload';
 
 function EmployeeDetailsSkeleton() {
@@ -74,15 +72,12 @@ function EmployeeDetailsSkeleton() {
 
 export default function EmployeeDetailsPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [employee, setEmployee] = useState(null);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [teamDialogOpen, setTeamDialogOpen] = useState(false);
-  const [allTeams, setAllTeams] = useState([]);
-  const [teamQuery, setTeamQuery] = useState('');
   const blurTimerRef = useRef(null);
 
   const handleFocus = () => {
@@ -92,7 +87,6 @@ export default function EmployeeDetailsPage() {
   const handleBlur = () => {
     blurTimerRef.current = setTimeout(() => setIsEditing(false), 150);
   };
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`/api/employees/${id}`)
@@ -105,17 +99,10 @@ export default function EmployeeDetailsPage() {
       });
   }, [id]);
 
-  useEffect(() => {
-    if (!teamDialogOpen) return;
-    fetch('/api/teams')
-      .then((res) => res.json())
-      .then(setAllTeams);
-  }, [teamDialogOpen]);
-
   return (
     <div className="p-6">
       <h1 className="text-2xl font-semibold">Mitarbeiter Detailansicht</h1>
-      <Button className="flex justify-start" onClick={() => navigate(`/employees`)}>
+      <Button className="flex justify-start" onClick={() => navigate('/employees')}>
         Zurück zur Übersicht
       </Button>
       {!employee ? (
@@ -184,14 +171,16 @@ export default function EmployeeDetailsPage() {
                 onFocus={handleFocus}
                 onBlur={handleBlur}
               />
-              <div className="mt-2 flex items-center gap-2">
-                <AppBadge label={`${employee.team.name} Team`} variant="team" />
-                <Button variant="ghost" size="xs" onClick={() => setTeamDialogOpen(true)}>
-                  ändern
-                </Button>
+              <div className="mt-2">
+                <TeamBadge
+                  team={employee.team}
+                  employeeId={id}
+                  onTeamChanged={setEmployee}
+                />
               </div>
             </div>
           </div>
+
           <div className="grid grid-cols-3 gap-4">
             <Card className="outline-solid outline-3">
               <CardContent className="pt-6">
@@ -222,104 +211,13 @@ export default function EmployeeDetailsPage() {
               </CardContent>
             </Card>
           </div>
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <span className="text-sm font-medium">Skills</span>
-              <Button variant="outline" size="sm" onClick={() => setDialogOpen(true)}>
-                Skills hinzufügen
-              </Button>
-            </div>
-            <div className="flex flex-wrap gap-1">
-              {employee.skills.map((s) => (
-                <AppBadge key={s.id} label={s.name} variant="skill" />
-              ))}
-            </div>
-            <AddSkillDialog
-              open={dialogOpen}
-              onOpenChange={setDialogOpen}
-              employeeId={id}
-              currentSkills={employee.skills}
-              onSkillAdded={(updatedSkills) => {
-                setEmployee((prev) => ({ ...prev, skills: updatedSkills }));
-                setDialogOpen(false);
-              }}
-            />
-            <Dialog
-              open={teamDialogOpen}
-              onOpenChange={(open) => {
-                setTeamDialogOpen(open);
-                if (!open) setTeamQuery('');
-              }}
-            >
-              <DialogContent className="max-w-sm">
-                <DialogHeader>
-                  <DialogTitle>Team ändern</DialogTitle>
-                </DialogHeader>
-                <Input
-                  placeholder="Team suchen..."
-                  value={teamQuery}
-                  onChange={(e) => setTeamQuery(e.target.value)}
-                  autoFocus
-                />
-                <div className="mt-1 max-h-60 overflow-y-auto">
-                  {(() => {
-                    const trimmed = teamQuery.trim();
-                    const filtered = allTeams.filter((t) =>
-                      t.name.toLowerCase().includes(trimmed.toLowerCase())
-                    );
-                    const exactMatch = allTeams.some(
-                      (t) => t.name.toLowerCase() === trimmed.toLowerCase()
-                    );
-                    const showCreate = trimmed.length > 0 && !exactMatch;
 
-                    const assignTeam = (teamId) =>
-                      fetch(`/api/employees/${id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ teamId }),
-                      })
-                        .then((r) => r.json())
-                        .then((updated) => {
-                          setEmployee(updated);
-                          setTeamDialogOpen(false);
-                          setTeamQuery('');
-                        });
+          <SkillBadgeList
+            skills={employee.skills}
+            employeeId={id}
+            onSkillsChanged={(skills) => setEmployee((prev) => ({ ...prev, skills }))}
+          />
 
-                    return (
-                      <>
-                        {filtered.map((team) => (
-                          <button
-                            key={team.id}
-                            onClick={() => assignTeam(team.id)}
-                            className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-muted"
-                          >
-                            {team.name}
-                          </button>
-                        ))}
-                        {showCreate && (
-                          <button
-                            onClick={async () => {
-                              const res = await fetch('/api/teams', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ name: trimmed }),
-                              });
-                              const newTeam = await res.json();
-                              setAllTeams((prev) => [...prev, newTeam]);
-                              await assignTeam(newTeam.id);
-                            }}
-                            className="w-full rounded-md px-3 py-2 text-left text-sm text-primary hover:bg-muted"
-                          >
-                            + &ldquo;{trimmed}&rdquo; als neues Team erstellen
-                          </button>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
           <div>
             <span className="mb-2 text-sm font-medium">Aktive Projekte</span>
             <div className="space-y-2">

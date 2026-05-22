@@ -1,23 +1,7 @@
 import AppBadge from '@/components/AppBadge';
 import { Card, CardContent } from '@/components/ui/card';
-
-const STATUS_LABELS = {
-  ACTIVE: 'Aktiv',
-  PLANNED: 'Geplant',
-  DONE: 'Abgeschlossen',
-};
-
-const STATUS_VARIANTS = {
-  ACTIVE: 'status-active',
-  PLANNED: 'status-planned',
-  DONE: 'status-done',
-};
-
-function formatDate(dateStr) {
-  if (!dateStr) return null;
-  const [y, m, d] = dateStr.split('-');
-  return `${d}.${m}.${y}`;
-}
+import { STATUS_LABELS, STATUS_VARIANTS } from '@/lib/projectStatus';
+import { formatDate } from '@/lib/format';
 
 export default function ProjectCard({
   title,

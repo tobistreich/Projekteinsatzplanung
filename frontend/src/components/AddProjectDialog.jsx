@@ -3,13 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import AppBadge from '@/components/AppBadge';
+import SearchableList from '@/components/SearchableList';
 import { XIcon } from 'lucide-react';
-
-const STATUS_OPTIONS = [
-  { value: 'PLANNED', label: 'Geplant' },
-  { value: 'ACTIVE', label: 'Aktiv' },
-  { value: 'DONE', label: 'Abgeschlossen' },
-];
+import { STATUS_OPTIONS } from '@/lib/projectStatus';
 
 export default function AddProjectDialog({ open, onOpenChange, onProjectCreated }) {
   const [title, setTitle] = useState('');
@@ -36,24 +32,16 @@ export default function AddProjectDialog({ open, onOpenChange, onProjectCreated 
       .then(setAllSkills);
   }, [open]);
 
-  const selectedSkillIds = new Set(selectedSkills.map((s) => s.id));
-  const filteredSkills = allSkills.filter(
-    (s) => !selectedSkillIds.has(s.id) && s.name.toLowerCase().includes(skillQuery.toLowerCase())
-  );
-  const trimmed = skillQuery.trim();
-  const exactMatch = allSkills.some((s) => s.name.toLowerCase() === trimmed.toLowerCase());
-  const showCreateOption = trimmed.length > 0 && !exactMatch;
-
   async function handleSelectSkill(skill) {
     setSelectedSkills((prev) => [...prev, skill]);
     setSkillQuery('');
   }
 
-  async function handleCreateSkill() {
+  async function handleCreateSkill(name) {
     const res = await fetch('/api/skills/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: trimmed }),
+      body: JSON.stringify({ name }),
     });
     const newSkill = await res.json();
     setSelectedSkills((prev) => [...prev, newSkill]);
@@ -93,6 +81,8 @@ export default function AddProjectDialog({ open, onOpenChange, onProjectCreated 
       setSubmitting(false);
     }
   }
+
+  const selectedSkillIds = new Set(selectedSkills.map((s) => s.id));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -158,32 +148,17 @@ export default function AddProjectDialog({ open, onOpenChange, onProjectCreated 
                 ))}
               </div>
             )}
-            <Input
+            <SearchableList
+              items={allSkills}
+              query={skillQuery}
+              onQueryChange={setSkillQuery}
+              onSelect={handleSelectSkill}
+              onCreate={handleCreateSkill}
+              excludeIds={selectedSkillIds}
               placeholder="Skill suchen..."
-              value={skillQuery}
-              onChange={(e) => setSkillQuery(e.target.value)}
+              createLabel="Skill"
+              maxHeight="max-h-40"
             />
-            {(filteredSkills.length > 0 || showCreateOption) && (
-              <div className="mt-1 max-h-40 overflow-y-auto border rounded-md">
-                {filteredSkills.map((skill) => (
-                  <button
-                    key={skill.id}
-                    onClick={() => handleSelectSkill(skill)}
-                    className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-muted"
-                  >
-                    {skill.name}
-                  </button>
-                ))}
-                {showCreateOption && (
-                  <button
-                    onClick={handleCreateSkill}
-                    className="w-full rounded-md px-3 py-2 text-left text-sm text-primary hover:bg-muted"
-                  >
-                    + &ldquo;{trimmed}&rdquo; als neuen Skill erstellen
-                  </button>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
