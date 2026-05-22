@@ -2,7 +2,7 @@ import AppBadge from '@/components/AppBadge';
 import AddSkillDialog from '@/components/AddSkillDialog';
 import ProjectCard from '@/components/ProjectCard';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -76,8 +76,18 @@ export default function EmployeeDetailsPage() {
   const [employee, setEmployee] = useState(null);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [jobTitle, setJobTitle] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const blurTimerRef = useRef(null);
+
+  const handleFocus = () => {
+    clearTimeout(blurTimerRef.current);
+    setIsEditing(true);
+  };
+  const handleBlur = () => {
+    blurTimerRef.current = setTimeout(() => setIsEditing(false), 150);
+  };
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -87,6 +97,7 @@ export default function EmployeeDetailsPage() {
         setEmployee(data);
         setFirstName(data.firstName);
         setLastName(data.lastName);
+        setJobTitle(data.jobTitle);
       });
   }, [id]);
 
@@ -111,19 +122,57 @@ export default function EmployeeDetailsPage() {
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   className="mt-1"
-                  onFocus={() => setIsEditing(true)}
-                  onBlur={() => setTimeout(() => setIsEditing(false), 150)}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
                 />
                 <Input
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   className="mt-1"
-                  onFocus={() => setIsEditing(true)}
-                  onBlur={() => setTimeout(() => setIsEditing(false), 150)}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
                 />
-                <Button className={isEditing ? 'visible' : 'invisible'}>Speichern</Button>
+                <Button
+                  className={isEditing ? 'visible' : 'invisible'}
+                  onClick={() =>
+                    fetch(`/api/employees/${id}`, {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ firstName, lastName, jobTitle }),
+                    })
+                      .then((r) => r.json())
+                      .then((updated) => {
+                        setEmployee(updated);
+                        setFirstName(updated.firstName);
+                        setLastName(updated.lastName);
+                        setJobTitle(updated.jobTitle);
+                        setIsEditing(false);
+                      })
+                  }
+                >
+                  Speichern
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={isEditing ? 'visible text-destructive' : 'invisible'}
+                  onClick={() => {
+                    setFirstName(employee.firstName);
+                    setLastName(employee.lastName);
+                    setJobTitle(employee.jobTitle);
+                    setIsEditing(false);
+                  }}
+                >
+                  ✕
+                </Button>
               </div>
-              <Input value={employee.jobTitle} readOnly className="mt-1" />
+              <Input
+                value={jobTitle}
+                onChange={(e) => setJobTitle(e.target.value)}
+                className="mt-1"
+                onFocus={() => setIsEditing(true)}
+                onBlur={() => setTimeout(() => setIsEditing(false), 150)}
+              />
               <div className="mt-2 flex">
                 <AppBadge label={`${employee.team.name} Team`} variant="team" />
               </div>
