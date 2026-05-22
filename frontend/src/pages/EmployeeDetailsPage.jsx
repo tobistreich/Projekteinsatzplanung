@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Workload from '@/components/Workload';
 
 function EmployeeDetailsSkeleton() {
@@ -79,6 +80,9 @@ export default function EmployeeDetailsPage() {
   const [jobTitle, setJobTitle] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [teamDialogOpen, setTeamDialogOpen] = useState(false);
+  const [allTeams, setAllTeams] = useState([]);
+  const [teamQuery, setTeamQuery] = useState('');
   const blurTimerRef = useRef(null);
 
   const handleFocus = () => {
@@ -100,6 +104,13 @@ export default function EmployeeDetailsPage() {
         setJobTitle(data.jobTitle);
       });
   }, [id]);
+
+  useEffect(() => {
+    if (!teamDialogOpen) return;
+    fetch('/api/teams')
+      .then((res) => res.json())
+      .then(setAllTeams);
+  }, [teamDialogOpen]);
 
   return (
     <div className="p-6">
@@ -170,11 +181,14 @@ export default function EmployeeDetailsPage() {
                 value={jobTitle}
                 onChange={(e) => setJobTitle(e.target.value)}
                 className="mt-1"
-                onFocus={() => setIsEditing(true)}
-                onBlur={() => setTimeout(() => setIsEditing(false), 150)}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
               />
-              <div className="mt-2 flex">
+              <div className="mt-2 flex items-center gap-2">
                 <AppBadge label={`${employee.team.name} Team`} variant="team" />
+                <Button variant="ghost" size="xs" onClick={() => setTeamDialogOpen(true)}>
+                  ändern
+                </Button>
               </div>
             </div>
           </div>
@@ -230,6 +244,81 @@ export default function EmployeeDetailsPage() {
                 setDialogOpen(false);
               }}
             />
+            <Dialog
+              open={teamDialogOpen}
+              onOpenChange={(open) => {
+                setTeamDialogOpen(open);
+                if (!open) setTeamQuery('');
+              }}
+            >
+              <DialogContent className="max-w-sm">
+                <DialogHeader>
+                  <DialogTitle>Team ändern</DialogTitle>
+                </DialogHeader>
+                <Input
+                  placeholder="Team suchen..."
+                  value={teamQuery}
+                  onChange={(e) => setTeamQuery(e.target.value)}
+                  autoFocus
+                />
+                <div className="mt-1 max-h-60 overflow-y-auto">
+                  {(() => {
+                    const trimmed = teamQuery.trim();
+                    const filtered = allTeams.filter((t) =>
+                      t.name.toLowerCase().includes(trimmed.toLowerCase())
+                    );
+                    const exactMatch = allTeams.some(
+                      (t) => t.name.toLowerCase() === trimmed.toLowerCase()
+                    );
+                    const showCreate = trimmed.length > 0 && !exactMatch;
+
+                    const assignTeam = (teamId) =>
+                      fetch(`/api/employees/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ teamId }),
+                      })
+                        .then((r) => r.json())
+                        .then((updated) => {
+                          setEmployee(updated);
+                          setTeamDialogOpen(false);
+                          setTeamQuery('');
+                        });
+
+                    return (
+                      <>
+                        {filtered.map((team) => (
+                          <button
+                            key={team.id}
+                            onClick={() => assignTeam(team.id)}
+                            className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-muted"
+                          >
+                            {team.name}
+                          </button>
+                        ))}
+                        {showCreate && (
+                          <button
+                            onClick={async () => {
+                              const res = await fetch('/api/teams', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ name: trimmed }),
+                              });
+                              const newTeam = await res.json();
+                              setAllTeams((prev) => [...prev, newTeam]);
+                              await assignTeam(newTeam.id);
+                            }}
+                            className="w-full rounded-md px-3 py-2 text-left text-sm text-primary hover:bg-muted"
+                          >
+                            + &ldquo;{trimmed}&rdquo; als neues Team erstellen
+                          </button>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
           <div>
             <span className="mb-2 text-sm font-medium">Aktive Projekte</span>

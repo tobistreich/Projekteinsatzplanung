@@ -1,5 +1,6 @@
 import AppBadge from '@/components/AppBadge';
 import Workload from '@/components/Workload';
+import AddEmployeeDialog from '@/components/AddEmployeeDialog';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Fragment, useState, useEffect } from 'react';
@@ -46,6 +47,7 @@ function EmployeeRowSkeleton() {
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   function loadEmployees() {
@@ -67,8 +69,13 @@ export default function EmployeesPage() {
     <div className="p-6">
       <h1 className="text-2xl font-semibold mb-4">Mitarbeiterübersicht</h1>
       <div className="flex justify-end mb-4">
-        <Button icon="plus">Neuer Mitarbeiter</Button>
+        <Button onClick={() => setDialogOpen(true)}>Neuer Mitarbeiter</Button>
       </div>
+      <AddEmployeeDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onEmployeeCreated={() => { setLoading(true); loadEmployees(); }}
+      />
       <Table>
         <TableHeader>
           <TableRow>
