@@ -6,6 +6,25 @@ import { Button } from '@/components/ui/button';
 export default function SkillBadgeList({ skills, employeeId, onSkillsChanged }) {
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  async function removeSkill(skillId) {
+    const updatedIds = skills.filter((s) => s.id !== skillId).map((s) => s.id);
+    await fetch(`/api/employees/${employeeId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ skillIds: updatedIds }),
+    });
+    onSkillsChanged(skills.filter((s) => s.id !== skillId));
+  }
+
+  async function assignSkill(skillId) {
+    const updatedIds = [...skills.map((s) => s.id), skillId];
+    await fetch(`/api/employees/${employeeId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ skillIds: updatedIds }),
+    });
+  }
+
   return (
     <div>
       <div className="mb-2 flex items-center gap-2">
@@ -16,14 +35,14 @@ export default function SkillBadgeList({ skills, employeeId, onSkillsChanged }) 
       </div>
       <div className="flex flex-wrap gap-1">
         {skills.map((s) => (
-          <AppBadge key={s.id} label={s.name} variant="skill" />
+          <AppBadge key={s.id} label={s.name} variant="skill" onRemove={() => removeSkill(s.id)} />
         ))}
       </div>
       <AddSkillDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        employeeId={employeeId}
         currentSkills={skills}
+        onAssign={assignSkill}
         onSkillAdded={(updatedSkills) => {
           onSkillsChanged(updatedSkills);
           setDialogOpen(false);

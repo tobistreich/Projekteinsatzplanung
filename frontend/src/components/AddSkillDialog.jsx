@@ -5,9 +5,9 @@ import SearchableList from '@/components/SearchableList';
 export default function AddSkillDialog({
   open,
   onOpenChange,
-  employeeId,
   currentSkills,
   onSkillAdded,
+  onAssign,
 }) {
   const [query, setQuery] = useState('');
   const [allSkills, setAllSkills] = useState([]);
@@ -22,13 +22,8 @@ export default function AddSkillDialog({
       .then(setAllSkills);
   }, [open]);
 
-  async function assignSkill(skillId, newSkillObj) {
-    const updatedIds = [...currentSkills.map((s) => s.id), skillId];
-    await fetch(`/api/employees/${employeeId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ skillIds: updatedIds }),
-    });
+  async function handleAssign(skillId, newSkillObj) {
+    await onAssign(skillId, newSkillObj);
     onSkillAdded([...currentSkills, newSkillObj]);
   }
 
@@ -39,7 +34,7 @@ export default function AddSkillDialog({
       body: JSON.stringify({ name }),
     });
     const newSkill = await res.json();
-    await assignSkill(newSkill.id, newSkill);
+    await handleAssign(newSkill.id, newSkill);
   }
 
   const currentSkillIds = new Set(currentSkills.map((s) => s.id));
@@ -54,7 +49,7 @@ export default function AddSkillDialog({
           items={allSkills}
           query={query}
           onQueryChange={setQuery}
-          onSelect={(skill) => assignSkill(skill.id, skill)}
+          onSelect={(skill) => handleAssign(skill.id, skill)}
           onCreate={handleCreateNew}
           excludeIds={currentSkillIds}
           placeholder="Skill suchen..."

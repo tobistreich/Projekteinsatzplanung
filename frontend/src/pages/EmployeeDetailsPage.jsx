@@ -101,10 +101,10 @@ export default function EmployeeDetailsPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold">Mitarbeiter Detailansicht</h1>
-      <Button className="flex justify-start" onClick={() => navigate('/employees')}>
-        Zurück zur Übersicht
+      <Button variant="ghost" className="px-0" onClick={() => navigate('/employees')}>
+        ← Zurück zur Übersicht
       </Button>
+      <h1 className="text-2xl font-semibold">Mitarbeiter Detailansicht</h1>
       {!employee ? (
         <EmployeeDetailsSkeleton />
       ) : (

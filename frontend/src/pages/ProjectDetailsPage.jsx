@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AppBadge from '@/components/AppBadge';
+import AddSkillDialog from '@/components/AddSkillDialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -33,6 +34,7 @@ export default function ProjectDetailsPage() {
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [assignments, setAssignments] = useState([]);
+  const [skillDialogOpen, setSkillDialogOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -46,6 +48,25 @@ export default function ProjectDetailsPage() {
 
   const totalHours = assignments.reduce((s, a) => s + (a.allocationHoursPerMonth ?? 0), 0);
 
+  async function removeSkill(skillId) {
+    const updatedIds = (project.skills ?? []).filter((s) => s.id !== skillId).map((s) => s.id);
+    await fetch(`/api/projects/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ skillIds: updatedIds }),
+    });
+    setProject((prev) => ({ ...prev, skills: prev.skills.filter((s) => s.id !== skillId) }));
+  }
+
+  async function assignSkill(skillId) {
+    const updatedIds = [...(project.skills ?? []).map((s) => s.id), skillId];
+    await fetch(`/api/projects/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ skillIds: updatedIds }),
+    });
+  }
+
   return (
     <div className="p-6 space-y-4">
       <Button variant="ghost" className="px-0" onClick={() => navigate('/projects')}>
@@ -57,8 +78,8 @@ export default function ProjectDetailsPage() {
       ) : (
         <>
           <div className="flex items-center gap-4 flex-wrap">
-            <h1 className="text-2xl font-semibold">{project.title}</h1>
-            <div className="flex gap-2">
+            <h1 className="text-2xl font-semibold justify-start">{project.title}</h1>
+            <div className="ml-20 flex gap-2">
               <Button variant="outline">Mitarbeiter zuweisen</Button>
               <Button variant="outline">Bearbeiten</Button>
               <Button variant="destructive">Löschen</Button>
@@ -70,10 +91,28 @@ export default function ProjectDetailsPage() {
             label={STATUS_LABELS[project.status] ?? project.status}
           />
 
-          <div className="flex flex-wrap gap-2">
-            {(project.skills ?? []).map((s) => (
-              <AppBadge key={s.id} label={s.name} variant="skill" />
-            ))}
+          <div>
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-sm font-medium">Skills</span>
+              <Button variant="outline" size="sm" onClick={() => setSkillDialogOpen(true)}>
+                Skills hinzufügen
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {(project.skills ?? []).map((s) => (
+                <AppBadge key={s.id} label={s.name} variant="skill" onRemove={() => removeSkill(s.id)} />
+              ))}
+            </div>
+            <AddSkillDialog
+              open={skillDialogOpen}
+              onOpenChange={setSkillDialogOpen}
+              currentSkills={project.skills ?? []}
+              onAssign={assignSkill}
+              onSkillAdded={(updatedSkills) => {
+                setProject((prev) => ({ ...prev, skills: updatedSkills }));
+                setSkillDialogOpen(false);
+              }}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
