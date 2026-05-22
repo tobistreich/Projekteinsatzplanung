@@ -1,15 +1,14 @@
 import ProjectCard from '@/components/ProjectCard';
+import AddProjectDialog from '@/components/AddProjectDialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { PlusCircleIcon } from 'lucide-react';
 
 function ProjectCardSkeleton() {
   return (
     <div>
-      <Button variant="ghost" className="p-0">
-        Projekt hinzufügen
-      </Button>
       <Card className="outline-solid outline-3">
         <CardContent className="flex items-center justify-between pb-4 pt-4">
           <div className="space-y-2 flex-1">
@@ -30,6 +29,7 @@ function ProjectCardSkeleton() {
 export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/projects')
@@ -41,11 +41,24 @@ export default function ProjectsPage() {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-semibold">Projektübersicht</h1>
-      <div className="mt-4 space-y-2">
+      <Button
+        variant="primary"
+        className="p-5 bg-amber-600"
+        onClick={() => setDialogOpen(true)}
+      >
+        <PlusCircleIcon />
+        Projekt hinzufügen
+      </Button>
+      <AddProjectDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onProjectCreated={(p) => setProjects((prev) => [p, ...prev])}
+      />
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading
           ? Array.from({ length: 4 }).map((_, i) => <ProjectCardSkeleton key={i} />)
           : projects.map((p) => (
-              <ProjectCard key={p.id} title={p.title} status={p.status} skills={p.skills} />
+              <ProjectCard key={p.id} title={p.title} status={p.status} skills={p.skills} startDate={p.startDate} endDate={p.endDate} />
             ))}
       </div>
     </div>

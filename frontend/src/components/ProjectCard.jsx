@@ -13,10 +13,18 @@ const STATUS_VARIANTS = {
   DONE: 'status-done',
 };
 
+function formatDate(dateStr) {
+  if (!dateStr) return null;
+  const [y, m, d] = dateStr.split('-');
+  return `${d}.${m}.${y}`;
+}
+
 export default function ProjectCard({
   title,
   status,
   skills,
+  startDate,
+  endDate,
   allocationPercent,
   allocationHoursPerMonth,
   billable,
@@ -25,13 +33,18 @@ export default function ProjectCard({
   const statusVariant = STATUS_VARIANTS[status] ?? 'secondary';
 
   return (
-    <Card className="outline-solid outline-3">
+    <Card className="outline-solid outline-3 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
       <CardContent className="flex items-center justify-between pb-4 pt-4">
-        <div>
+        <div className="w-full">
           <div className="flex items-center gap-4 my-1">
             <AppBadge variant="project" label={title} className="text-lg font-semibold" />
             <AppBadge variant={statusVariant} label={statusLabel} />
           </div>
+          {(startDate || endDate) && (
+            <span className="text-sm text-muted-foreground mt-1 block text-left">
+              {formatDate(startDate)} – {formatDate(endDate)}
+            </span>
+          )}
           <div className="mt-2 flex flex-wrap gap-2">
             {(skills ?? []).map((s) => (
               <AppBadge key={s.id} label={s.name} variant="skill" />
