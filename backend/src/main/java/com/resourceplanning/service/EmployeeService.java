@@ -10,7 +10,6 @@ import com.resourceplanning.repository.EmployeeRepository;
 import com.resourceplanning.repository.SkillRepository;
 import com.resourceplanning.repository.TeamRepository;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -107,22 +106,22 @@ public class EmployeeService {
                 .map(s -> SkillDto.builder().id(s.getId()).name(s.getName()).build())
                 .toList();
 
-        LocalDate monthStart = YearMonth.now().atDay(1);
-        LocalDate monthEnd = YearMonth.now().atEndOfMonth();
+        LocalDate today = LocalDate.now();
 
-        List<Assignment> activeAssignments = assignmentRepository.findByEmployeeId(employee.getId())
-                .stream()
-                .filter(a -> !a.getStartDate().isAfter(monthEnd) && !a.getEndDate().isBefore(monthStart))
+        List<Assignment> allAssignments = assignmentRepository.findByEmployeeId(employee.getId());
+
+        List<Assignment> activeAndUpcomingAssignments = allAssignments.stream()
+                .filter(a -> a.getEndDate() != null && !a.getEndDate().isBefore(today))
                 .toList();
 
-        int totalAllocated = activeAssignments.stream()
+        int totalAllocated = activeAndUpcomingAssignments.stream()
                 .mapToInt(a -> a.getAllocationHoursPerMonth() != null ? a.getAllocationHoursPerMonth() : 0)
                 .sum();
-        int billableAllocated = activeAssignments.stream()
+        int billableAllocated = activeAndUpcomingAssignments.stream()
                 .filter(a -> Boolean.TRUE.equals(a.getBillable()))
                 .mapToInt(a -> a.getAllocationHoursPerMonth() != null ? a.getAllocationHoursPerMonth() : 0)
                 .sum();
-        int internalAllocated = activeAssignments.stream()
+        int internalAllocated = activeAndUpcomingAssignments.stream()
                 .filter(a -> !Boolean.TRUE.equals(a.getBillable()))
                 .mapToInt(a -> a.getAllocationHoursPerMonth() != null ? a.getAllocationHoursPerMonth() : 0)
                 .sum();
@@ -137,7 +136,7 @@ public class EmployeeService {
                 ? (internalAllocated * 100) / totalAllocated
                 : 0;
 
-        List<ProjectSummaryDto> projects = activeAssignments.stream()
+        List<ProjectSummaryDto> projects = activeAndUpcomingAssignments.stream()
                 .map(a -> {
                     int allocPercent = (employee.getMonthlyCapacityHours() != null && employee.getMonthlyCapacityHours() > 0)
                             ? (a.getAllocationHoursPerMonth() != null ? (a.getAllocationHoursPerMonth() * 100) / employee.getMonthlyCapacityHours() : 0)

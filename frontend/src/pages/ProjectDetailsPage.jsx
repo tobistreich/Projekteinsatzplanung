@@ -1,12 +1,33 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AppBadge from '@/components/AppBadge';
 import AddSkillDialog from '@/components/AddSkillDialog';
 import AddAssignmentDialog from '@/components/AddAssignmentDialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { STATUS_LABELS, STATUS_VARIANTS } from '@/lib/projectStatus';
+import { getSkillColorClass } from '@/lib/skillColors';
+
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table.jsx';
 
 function ProjectDetailsSkeleton() {
   return (
@@ -35,8 +56,20 @@ export default function ProjectDetailsPage() {
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [assignments, setAssignments] = useState([]);
+  const [title, setTitle] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [skillDialogOpen, setSkillDialogOpen] = useState(false);
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
+  const blurTimerRef = useRef(null);
+
+  const handleFocus = () => {
+    clearTimeout(blurTimerRef.current);
+    setIsEditing(true);
+  };
+  const handleBlur = () => {
+    blurTimerRef.current = setTimeout(() => setIsEditing(false), 150);
+  };
 
   useEffect(() => {
     Promise.all([
@@ -44,6 +77,7 @@ export default function ProjectDetailsPage() {
       fetch(`/api/assignments/project/${id}`).then((r) => r.json()),
     ]).then(([proj, asns]) => {
       setProject(proj);
+      setTitle(proj.title);
       setAssignments(asns);
     });
   }, [id]);
@@ -80,21 +114,84 @@ export default function ProjectDetailsPage() {
       ) : (
         <>
           <div className="flex items-center gap-4 flex-wrap">
-            <h1 className="text-2xl font-semibold justify-start">{project.title}</h1>
-            <div className="ml-20 flex gap-2">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="text-2xl font-semibold w-auto"
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+            />
+            <Button
+              className={isEditing ? 'visible' : 'invisible'}
+              onClick={() =>
+                fetch(`/api/projects/${id}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ title }),
+                })
+                  .then((r) => r.json())
+                  .then((updated) => {
+                    setProject(updated);
+                    setTitle(updated.title);
+                    setIsEditing(false);
+                  })
+              }
+            >
+              Speichern
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={isEditing ? 'visible text-destructive' : 'invisible'}
+              onClick={() => {
+                setTitle(project.title);
+                setIsEditing(false);
+              }}
+            >
+              ✕
+            </Button>
+            <p>
+              {new Date(project.startDate).toLocaleDateString('de-DE')} -{' '}
+              {new Date(project.endDate).toLocaleDateString('de-DE')}
+            </p>
+            <div className="ml-auto flex gap-2">
               <Button variant="outline" onClick={() => setAssignmentDialogOpen(true)}>
                 Mitarbeiter zuweisen
               </Button>
-              <Button variant="outline">Bearbeiten</Button>
-              <Button variant="destructive">Löschen</Button>
+              <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+                Löschen
+              </Button>
             </div>
           </div>
 
+          <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Projekt löschen?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Möchten Sie das Projekt <strong>{project.title}</strong> wirklich löschen? Diese
+                  Aktion kann nicht rückgängig gemacht werden.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={() =>
+                    fetch(`/api/projects/${id}`, { method: 'DELETE' }).then(() =>
+                      navigate('/projects')
+                    )
+                  }
+                >
+                  Löschen
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <AppBadge
             variant={STATUS_VARIANTS[project.status] ?? 'secondary'}
             label={STATUS_LABELS[project.status] ?? project.status}
           />
-
           <div>
             <div className="mb-2 flex items-center gap-2">
               <span className="text-sm font-medium">Skills</span>
@@ -108,6 +205,7 @@ export default function ProjectDetailsPage() {
                   key={s.id}
                   label={s.name}
                   variant="skill"
+                  colorClass={getSkillColorClass(s)}
                   onRemove={() => removeSkill(s.id)}
                 />
               ))}
@@ -134,7 +232,6 @@ export default function ProjectDetailsPage() {
               }}
             />
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <Card className="outline-solid outline-3">
               <CardContent className="pt-6">
@@ -153,6 +250,66 @@ export default function ProjectDetailsPage() {
                 <p className="text-sm text-muted-foreground">pro Monat</p>
               </CardContent>
             </Card>
+          </div>
+          <div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Skills</TableHead>
+                  <TableHead>Kapazität</TableHead>
+                  <TableHead>Auslastung</TableHead>
+                  <TableHead>Typ</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {assignments.map((a) => (
+                  <TableRow key={a.id}>
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        onClick={() => navigate(`/employee-details/${a.employee.id}`)}
+                      >
+                        {a.employee.firstName} {a.employee.lastName}
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {(a.employee.skills ?? []).map((s) => (
+                          <AppBadge key={s.id} label={s.name} variant="skill" colorClass={getSkillColorClass(s)} />
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>{a.allocationHoursPerMonth} h</TableCell>
+                    <TableCell>
+                      {Math.round(((a.allocationHoursPerMonth ?? 0) / 160) * 100)}%
+                    </TableCell>
+                    <TableCell>{a.billable ? 'Faktura' : 'Intern'}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              'Sind Sie sicher, dass Sie diese Zuweisung löschen möchten?'
+                            )
+                          ) {
+                            fetch(`/api/assignments/${a.id}`, { method: 'DELETE' }).then(() =>
+                              fetch(`/api/assignments/project/${id}`)
+                                .then((r) => r.json())
+                                .then(setAssignments)
+                            );
+                          }
+                        }}
+                      >
+                        Zuweisung entfernen
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </>
       )}

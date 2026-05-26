@@ -1,4 +1,5 @@
 import AppBadge from '@/components/AppBadge';
+import { getSkillColorClass } from '@/lib/skillColors';
 import { Card, CardContent } from '@/components/ui/card';
 import { STATUS_LABELS, STATUS_VARIANTS } from '@/lib/projectStatus';
 import { formatDate } from '@/lib/format';
@@ -35,7 +36,7 @@ export default function ProjectCard({
           )}
           <div className="mt-2 flex flex-wrap gap-2">
             {(skills ?? []).map((s) => (
-              <AppBadge key={s.id} label={s.name} variant="skill" />
+              <AppBadge key={s.id} label={s.name} variant="skill" colorClass={getSkillColorClass(s)} />
             ))}
           </div>
         </div>

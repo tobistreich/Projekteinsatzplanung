@@ -1,12 +1,15 @@
 import { Badge } from '@/components/ui/badge';
 
-export default function AppBadge({ label, variant, onRemove }) {
+export default function AppBadge({ label, variant, colorClass, onRemove }) {
   return (
-    <Badge variant={variant}>
+    <Badge variant={variant} className={colorClass}>
       {label}
       {onRemove && (
         <span
-          onClick={(e) => { e.stopPropagation(); onRemove(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
           className="w-0 overflow-hidden group-hover/badge:w-4 transition-[width] duration-200 flex items-center justify-center cursor-pointer shrink-0"
         >
           <svg

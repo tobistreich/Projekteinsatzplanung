@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import AppBadge from '@/components/AppBadge';
+import { getSkillColorClass } from '@/lib/skillColors';
 import AddSkillDialog from '@/components/AddSkillDialog';
 import { Button } from '@/components/ui/button';
 
@@ -35,7 +36,7 @@ export default function SkillBadgeList({ skills, employeeId, onSkillsChanged }) 
       </div>
       <div className="flex flex-wrap gap-1">
         {skills.map((s) => (
-          <AppBadge key={s.id} label={s.name} variant="skill" onRemove={() => removeSkill(s.id)} />
+          <AppBadge key={s.id} label={s.name} variant="skill" colorClass={getSkillColorClass(s)} onRemove={() => removeSkill(s.id)} />
         ))}
       </div>
       <AddSkillDialog

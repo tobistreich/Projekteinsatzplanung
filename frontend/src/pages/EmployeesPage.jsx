@@ -1,4 +1,5 @@
 import AppBadge from '@/components/AppBadge';
+import { getSkillColorClass } from '@/lib/skillColors';
 import Workload from '@/components/Workload';
 import AddEmployeeDialog from '@/components/AddEmployeeDialog';
 import { Button } from '@/components/ui/button';
@@ -112,7 +113,7 @@ export default function EmployeesPage() {
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {e.skills.map((s) => (
-                            <AppBadge key={s.id} label={s.name} variant="skill" />
+                            <AppBadge key={s.id} label={s.name} variant="skill" colorClass={getSkillColorClass(s)} />
                           ))}
                         </div>
                       </TableCell>

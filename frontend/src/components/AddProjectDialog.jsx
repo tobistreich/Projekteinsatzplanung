@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import AppBadge from '@/components/AppBadge';
+import { getSkillColorClass } from '@/lib/skillColors';
 import SearchableList from '@/components/SearchableList';
 import { XIcon } from 'lucide-react';
 import { STATUS_OPTIONS } from '@/lib/projectStatus';
@@ -129,7 +130,7 @@ export default function AddProjectDialog({ open, onOpenChange, onProjectCreated 
               <div className="flex flex-wrap gap-1 mb-2">
                 {selectedSkills.map((skill) => (
                   <span key={skill.id} className="flex items-center gap-1">
-                    <AppBadge label={skill.name} variant="skill" />
+                    <AppBadge label={skill.name} variant="skill" colorClass={getSkillColorClass(skill)} />
                     <button
                       onClick={() => removeSkill(skill.id)}
                       className="text-muted-foreground hover:text-foreground"

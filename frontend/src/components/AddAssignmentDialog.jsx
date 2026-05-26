@@ -6,8 +6,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Switch } from '@/components/ui/switch';
 import AppBadge from '@/components/AppBadge';
+import { getSkillColorClass } from '@/lib/skillColors';
 
-export default function AddAssignmentDialog({ open, onOpenChange, project, assignments = [], onAssigned }) {
+export default function AddAssignmentDialog({
+  open,
+  onOpenChange,
+  project,
+  assignments = [],
+  onAssigned,
+}) {
   // null = noch nicht geladen (loading), [] = geladen aber leer
   const [matchingEmployees, setMatchingEmployees] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -89,19 +96,11 @@ export default function AddAssignmentDialog({ open, onOpenChange, project, assig
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground">Startdatum</label>
-            <Input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
+            <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
           </div>
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground">Enddatum</label>
-            <Input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
+            <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
           </div>
         </div>
 
@@ -160,7 +159,7 @@ export default function AddAssignmentDialog({ open, onOpenChange, project, assig
                   <div className="text-xs text-muted-foreground">{emp.jobTitle}</div>
                   <div className="flex flex-wrap gap-1 mt-1.5">
                     {emp.matchedSkills.map((skill) => (
-                      <AppBadge key={skill.id} label={skill.name} variant="skill" />
+                      <AppBadge key={skill.id} label={skill.name} variant="skill" colorClass={getSkillColorClass(skill)} />
                     ))}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
