@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AppBadge from '@/components/AppBadge';
 import AddSkillDialog from '@/components/AddSkillDialog';
+import AddAssignmentDialog from '@/components/AddAssignmentDialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -35,6 +36,7 @@ export default function ProjectDetailsPage() {
   const [project, setProject] = useState(null);
   const [assignments, setAssignments] = useState([]);
   const [skillDialogOpen, setSkillDialogOpen] = useState(false);
+  const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -80,7 +82,9 @@ export default function ProjectDetailsPage() {
           <div className="flex items-center gap-4 flex-wrap">
             <h1 className="text-2xl font-semibold justify-start">{project.title}</h1>
             <div className="ml-20 flex gap-2">
-              <Button variant="outline">Mitarbeiter zuweisen</Button>
+              <Button variant="outline" onClick={() => setAssignmentDialogOpen(true)}>
+                Mitarbeiter zuweisen
+              </Button>
               <Button variant="outline">Bearbeiten</Button>
               <Button variant="destructive">Löschen</Button>
             </div>
@@ -100,7 +104,12 @@ export default function ProjectDetailsPage() {
             </div>
             <div className="flex flex-wrap gap-1">
               {(project.skills ?? []).map((s) => (
-                <AppBadge key={s.id} label={s.name} variant="skill" onRemove={() => removeSkill(s.id)} />
+                <AppBadge
+                  key={s.id}
+                  label={s.name}
+                  variant="skill"
+                  onRemove={() => removeSkill(s.id)}
+                />
               ))}
             </div>
             <AddSkillDialog
@@ -111,6 +120,17 @@ export default function ProjectDetailsPage() {
               onSkillAdded={(updatedSkills) => {
                 setProject((prev) => ({ ...prev, skills: updatedSkills }));
                 setSkillDialogOpen(false);
+              }}
+            />
+            <AddAssignmentDialog
+              open={assignmentDialogOpen}
+              onOpenChange={setAssignmentDialogOpen}
+              project={project}
+              assignments={assignments}
+              onAssigned={() => {
+                fetch(`/api/assignments/project/${id}`)
+                  .then((r) => r.json())
+                  .then(setAssignments);
               }}
             />
           </div>
