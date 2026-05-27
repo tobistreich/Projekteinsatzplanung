@@ -4,6 +4,7 @@ import com.resourceplanning.dto.AssignmentDto;
 import com.resourceplanning.dto.CreateAssignmentDto;
 import com.resourceplanning.dto.EmployeeSummaryDto;
 import com.resourceplanning.dto.ProjectSummaryDto;
+import com.resourceplanning.dto.SkillDto;
 import com.resourceplanning.entity.Assignment;
 import com.resourceplanning.entity.Employee;
 import com.resourceplanning.entity.Project;
@@ -91,7 +92,7 @@ public class AssignmentService {
         List<Assignment> existing = assignmentRepository.findByEmployeeId(employee.getId());
 
         YearMonth start = YearMonth.from(dto.getStartDate());
-        YearMonth end = YearMonth.from(dto.getEndDate());
+        YearMonth end = dto.getEndDate() != null ? YearMonth.from(dto.getEndDate()) : YearMonth.now().plusYears(10);
 
         for (YearMonth month = start; !month.isAfter(end); month = month.plusMonths(1)) {
             final YearMonth m = month;
@@ -121,6 +122,10 @@ public class AssignmentService {
                         .firstName(e.getFirstName())
                         .lastName(e.getLastName())
                         .jobTitle(e.getJobTitle())
+                        .skills(e.getSkills() == null ? List.of() :
+                                e.getSkills().stream()
+                                        .map(s -> SkillDto.builder().id(s.getId()).name(s.getName()).build())
+                                        .toList())
                         .build())
                 .project(ProjectSummaryDto.builder()
                         .id(p.getId())

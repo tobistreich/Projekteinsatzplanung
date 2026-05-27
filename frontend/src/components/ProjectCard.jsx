@@ -17,6 +17,7 @@ export default function ProjectCard({
 }) {
   const statusLabel = STATUS_LABELS[status] ?? status;
   const statusVariant = STATUS_VARIANTS[status] ?? 'secondary';
+  const isUpcoming = startDate && new Date(startDate) > new Date();
 
   return (
     <Card
@@ -28,6 +29,7 @@ export default function ProjectCard({
           <div className="flex items-center gap-4 my-1">
             <AppBadge variant="project" label={title} className="text-lg font-semibold" />
             <AppBadge variant={statusVariant} label={statusLabel} />
+            {isUpcoming && <AppBadge variant="secondary" label="Geplant" />}
           </div>
           {(startDate || endDate) && (
             <span className="text-sm text-muted-foreground mt-1 block text-left">

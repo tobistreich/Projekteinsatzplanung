@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CirclePlusIcon, PlusCircleIcon } from 'lucide-react';
 import AppBadge from '@/components/AppBadge';
@@ -74,16 +74,32 @@ export default function ProjectDetailsPage() {
     blurTimerRef.current = setTimeout(() => setIsEditing(false), 150);
   };
 
+  const fetchAssignments = useCallback(
+    () =>
+      fetch(`/api/assignments/project/${id}`)
+        .then((r) => r.json())
+        .then((asns) =>
+          Promise.all(
+            asns.map((a) =>
+              fetch(`/api/employees/${a.employee.id}`)
+                .then((r) => r.json())
+                .then((emp) => ({ ...a, employee: emp }))
+            )
+          )
+        ),
+    [id]
+  );
+
   useEffect(() => {
     Promise.all([
       fetch(`/api/projects/${id}`).then((r) => r.json()),
-      fetch(`/api/assignments/project/${id}`).then((r) => r.json()),
-    ]).then(([proj, asns]) => {
+      fetchAssignments(),
+    ]).then(([proj, enrichedAsns]) => {
       setProject(proj);
       setTitle(proj.title);
-      setAssignments(asns);
+      setAssignments(enrichedAsns);
     });
-  }, [id]);
+  }, [id, fetchAssignments]);
 
   const totalHours = assignments.reduce((s, a) => s + (a.allocationHoursPerMonth ?? 0), 0);
 
@@ -158,7 +174,7 @@ export default function ProjectDetailsPage() {
               {new Date(project.endDate).toLocaleDateString('de-DE')}
             </p>
             <div className="ml-auto flex gap-2">
-              <Button variant="outline" onClick={() => setAssignmentDialogOpen(true)}>
+              <Button onClick={() => setAssignmentDialogOpen(true)}>
                 <CirclePlusIcon />
                 Mitarbeiter zuweisen
               </Button>
@@ -213,10 +229,7 @@ export default function ProjectDetailsPage() {
                   className="bg-red-500 text-white hover:bg-red-600"
                   onClick={() =>
                     fetch(`/api/assignments/${assignmentToDelete.id}`, { method: 'DELETE' }).then(
-                      () =>
-                        fetch(`/api/assignments/project/${id}`)
-                          .then((r) => r.json())
-                          .then(setAssignments)
+                      () => fetchAssignments().then(setAssignments)
                     )
                   }
                 >
@@ -264,11 +277,7 @@ export default function ProjectDetailsPage() {
               onOpenChange={setAssignmentDialogOpen}
               project={project}
               assignments={assignments}
-              onAssigned={() => {
-                fetch(`/api/assignments/project/${id}`)
-                  .then((r) => r.json())
-                  .then(setAssignments);
-              }}
+              onAssigned={() => fetchAssignments().then(setAssignments)}
             />
           </div>
           <div className="grid grid-cols-2 gap-4">

@@ -60,6 +60,10 @@ export default function AddAssignmentDialog({
       );
       return;
     }
+    if (endDate && endDate < new Date().toISOString().split('T')[0]) {
+      setError('Das Enddatum liegt in der Vergangenheit – die Zuweisung wäre sofort abgeschlossen.');
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await fetch('/api/assignments', {
@@ -69,7 +73,7 @@ export default function AddAssignmentDialog({
           employeeId: emp.id,
           projectId: project.id,
           startDate,
-          endDate,
+          endDate: endDate || null,
           allocationHoursPerMonth: h,
           billable,
         }),

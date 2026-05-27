@@ -14,6 +14,11 @@ public class AssignmentRepository implements PanacheRepository<Assignment> {
     }
 
     public List<Assignment> findByProjectId(Long projectId) {
-        return find("project.id", projectId).list();
+        return getEntityManager()
+                .createQuery(
+                        "SELECT DISTINCT a FROM Assignment a JOIN FETCH a.employee e LEFT JOIN FETCH e.skills WHERE a.project.id = :projectId",
+                        Assignment.class)
+                .setParameter("projectId", projectId)
+                .getResultList();
     }
 }

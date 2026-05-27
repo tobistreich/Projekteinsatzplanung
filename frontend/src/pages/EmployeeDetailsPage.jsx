@@ -7,6 +7,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import Workload from '@/components/Workload';
 
 function EmployeeDetailsSkeleton() {
@@ -78,6 +88,7 @@ export default function EmployeeDetailsPage() {
   const [lastName, setLastName] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const blurTimerRef = useRef(null);
 
   const handleFocus = () => {
@@ -110,6 +121,33 @@ export default function EmployeeDetailsPage() {
       ) : (
         <div className="m-4 space-y-4">
           <div className="flex items-start gap-4">
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Mitarbeiter löschen?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Möchten Sie{' '}
+                    <strong>
+                      {employee.firstName} {employee.lastName}
+                    </strong>{' '}
+                    wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-red-500 text-white hover:bg-red-600"
+                    onClick={() =>
+                      fetch(`/api/employees/${id}`, { method: 'DELETE' }).then(() =>
+                        navigate('/employees')
+                      )
+                    }
+                  >
+                    Löschen
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-2xl font-semibold text-white">
               {employee.firstName.charAt(0).toUpperCase()}
               {employee.lastName.charAt(0).toUpperCase()}
@@ -131,7 +169,7 @@ export default function EmployeeDetailsPage() {
                   onBlur={handleBlur}
                 />
                 <Button
-                  className={isEditing ? 'visible' : 'invisible'}
+                  className={isEditing ? '' : 'hidden'}
                   onClick={() =>
                     fetch(`/api/employees/${id}`, {
                       method: 'PUT',
@@ -153,7 +191,7 @@ export default function EmployeeDetailsPage() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={isEditing ? 'visible text-destructive' : 'invisible'}
+                  className={isEditing ? 'text-destructive' : 'hidden'}
                   onClick={() => {
                     setFirstName(employee.firstName);
                     setLastName(employee.lastName);
@@ -161,7 +199,17 @@ export default function EmployeeDetailsPage() {
                     setIsEditing(false);
                   }}
                 >
-                  ✕
+                  <svg
+                    viewBox="0 0 10 10"
+                    className="size-3 stroke-black stroke-[1.5] fill-none"
+                    aria-hidden
+                  >
+                    <line x1="1" y1="1" x2="9" y2="9" />
+                    <line x1="9" y1="1" x2="1" y2="9" />
+                  </svg>
+                </Button>
+                <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+                  Löschen
                 </Button>
               </div>
               <Input
@@ -223,6 +271,8 @@ export default function EmployeeDetailsPage() {
                   title={p.title}
                   status={p.status}
                   skills={p.skills}
+                  startDate={p.startDate}
+                  endDate={p.endDate}
                   allocationPercent={p.allocationPercent}
                   allocationHoursPerMonth={p.allocationHoursPerMonth}
                   billable={p.billable}

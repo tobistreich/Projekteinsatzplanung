@@ -4,6 +4,7 @@ import com.resourceplanning.entity.ProjectStatus;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -19,4 +20,6 @@ public class ProjectSummaryDto {
     private Integer allocationPercent;
     private Integer allocationHoursPerMonth;
     private Boolean billable;
+    private LocalDate startDate;
+    private LocalDate endDate;
 }

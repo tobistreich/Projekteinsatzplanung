@@ -111,7 +111,7 @@ public class EmployeeService {
         List<Assignment> allAssignments = assignmentRepository.findByEmployeeId(employee.getId());
 
         List<Assignment> activeAndUpcomingAssignments = allAssignments.stream()
-                .filter(a -> a.getEndDate() != null && !a.getEndDate().isBefore(today))
+                .filter(a -> a.getEndDate() == null || !a.getEndDate().isBefore(today))
                 .toList();
 
         int totalAllocated = activeAndUpcomingAssignments.stream()
@@ -152,6 +152,8 @@ public class EmployeeService {
                             .allocationPercent(allocPercent)
                             .allocationHoursPerMonth(a.getAllocationHoursPerMonth())
                             .billable(a.getBillable())
+                            .startDate(a.getStartDate())
+                            .endDate(a.getEndDate())
                             .build();
                 })
                 .toList();
