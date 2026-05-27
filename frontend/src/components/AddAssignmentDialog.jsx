@@ -61,7 +61,9 @@ export default function AddAssignmentDialog({
       return;
     }
     if (endDate && endDate < new Date().toISOString().split('T')[0]) {
-      setError('Das Enddatum liegt in der Vergangenheit – die Zuweisung wäre sofort abgeschlossen.');
+      setError(
+        'Das Enddatum liegt in der Vergangenheit – die Zuweisung wäre sofort abgeschlossen.'
+      );
       return;
     }
     setSubmitting(true);

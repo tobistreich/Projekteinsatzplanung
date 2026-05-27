@@ -91,14 +91,13 @@ export default function ProjectDetailsPage() {
   );
 
   useEffect(() => {
-    Promise.all([
-      fetch(`/api/projects/${id}`).then((r) => r.json()),
-      fetchAssignments(),
-    ]).then(([proj, enrichedAsns]) => {
-      setProject(proj);
-      setTitle(proj.title);
-      setAssignments(enrichedAsns);
-    });
+    Promise.all([fetch(`/api/projects/${id}`).then((r) => r.json()), fetchAssignments()]).then(
+      ([proj, enrichedAsns]) => {
+        setProject(proj);
+        setTitle(proj.title);
+        setAssignments(enrichedAsns);
+      }
+    );
   }, [id, fetchAssignments]);
 
   const totalHours = assignments.reduce((s, a) => s + (a.allocationHoursPerMonth ?? 0), 0);

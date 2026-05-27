@@ -2,7 +2,11 @@ import { Badge } from '@/components/ui/badge';
 
 export default function AppBadge({ label, variant, colorClass, onRemove, onClick }) {
   return (
-    <Badge variant={variant} className={`${colorClass ?? ''} ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}>
+    <Badge
+      variant={variant}
+      className={`${colorClass ?? ''} ${onClick ? 'cursor-pointer' : ''}`}
+      onClick={onClick}
+    >
       {label}
       {onRemove && (
         <span
