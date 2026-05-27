@@ -130,7 +130,11 @@ export default function AddProjectDialog({ open, onOpenChange, onProjectCreated 
               <div className="flex flex-wrap gap-1 mb-2">
                 {selectedSkills.map((skill) => (
                   <span key={skill.id} className="flex items-center gap-1">
-                    <AppBadge label={skill.name} variant="skill" colorClass={getSkillColorClass(skill)} />
+                    <AppBadge
+                      label={skill.name}
+                      variant="skill"
+                      colorClass={getSkillColorClass(skill)}
+                    />
                     <button
                       onClick={() => removeSkill(skill.id)}
                       className="text-muted-foreground hover:text-foreground"
@@ -159,11 +163,7 @@ export default function AddProjectDialog({ open, onOpenChange, onProjectCreated 
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>
             Abbrechen
           </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!title.trim() || submitting}
-            className="bg-amber-600 hover:bg-amber-700"
-          >
+          <Button onClick={handleSubmit} disabled={!title.trim() || submitting}>
             {submitting ? 'Wird erstellt...' : 'Erstellen'}
           </Button>
         </div>

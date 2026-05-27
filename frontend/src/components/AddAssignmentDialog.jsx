@@ -159,7 +159,12 @@ export default function AddAssignmentDialog({
                   <div className="text-xs text-muted-foreground">{emp.jobTitle}</div>
                   <div className="flex flex-wrap gap-1 mt-1.5">
                     {emp.matchedSkills.map((skill) => (
-                      <AppBadge key={skill.id} label={skill.name} variant="skill" colorClass={getSkillColorClass(skill)} />
+                      <AppBadge
+                        key={skill.id}
+                        label={skill.name}
+                        variant="skill"
+                        colorClass={getSkillColorClass(skill)}
+                      />
                     ))}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">

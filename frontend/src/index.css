@@ -35,37 +35,41 @@
     font-size: 16px;
   }
 
-  --background: oklch(1 0 0);
+  --background: var(--color-slate-50);
 
-  --foreground: oklch(0.145 0 0);
+  --foreground: var(--color-slate-900);
 
   --card: oklch(1 0 0);
 
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: var(--color-slate-900);
 
   --popover: oklch(1 0 0);
 
-  --popover-foreground: oklch(0.145 0 0);
+  --popover-foreground: var(--color-slate-900);
 
-  --primary: oklch(0.205 0 0);
+  --primary: var(--color-indigo-500);
 
-  --primary-foreground: oklch(0.985 0 0);
+  --primary-foreground: oklch(1 0 0);
 
-  --secondary: oklch(0.97 0 0);
+  --secondary: var(--color-slate-100);
 
-  --secondary-foreground: oklch(0.205 0 0);
+  --secondary-foreground: var(--color-slate-900);
 
-  --muted: oklch(0.97 0 0);
+  --muted: var(--color-slate-100);
 
-  --muted-foreground: oklch(0.556 0 0);
+  --muted-foreground: var(--color-slate-600);
 
-  --accent-foreground: oklch(0.205 0 0);
+  --accent: var(--color-indigo-100);
 
-  --destructive: oklch(0.577 0.245 27.325);
+  --accent-foreground: var(--color-indigo-700);
 
-  --input: oklch(0.922 0 0);
+  --destructive: var(--color-red-500);
 
-  --ring: oklch(0.708 0 0);
+  --border: var(--color-slate-200);
+
+  --input: var(--color-slate-200);
+
+  --ring: var(--color-indigo-300);
 
   --chart-1: oklch(0.87 0 0);
 
@@ -128,31 +132,6 @@ body {
   box-sizing: border-box;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
 p {
   margin: 0;
 }

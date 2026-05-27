@@ -7,7 +7,7 @@ import ProjectDetailsPage from './pages/ProjectDetailsPage';
 
 function App() {
   return (
-    <div className="mx-auto w-[85%] bg-background">
+    <div className="mx-auto w-[85%] bg-slate-50 min-h-screen">
       <NavBar />
       <Routes>
         <Route path="/" element={<Navigate to="/employees" replace />} />

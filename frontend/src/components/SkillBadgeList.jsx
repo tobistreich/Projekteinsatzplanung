@@ -3,6 +3,7 @@ import AppBadge from '@/components/AppBadge';
 import { getSkillColorClass } from '@/lib/skillColors';
 import AddSkillDialog from '@/components/AddSkillDialog';
 import { Button } from '@/components/ui/button';
+import { PlusCircleIcon } from 'lucide-react';
 
 export default function SkillBadgeList({ skills, employeeId, onSkillsChanged }) {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -31,12 +32,19 @@ export default function SkillBadgeList({ skills, employeeId, onSkillsChanged }) 
       <div className="mb-2 flex items-center gap-2">
         <span className="text-sm font-medium">Skills</span>
         <Button variant="outline" size="sm" onClick={() => setDialogOpen(true)}>
+          <PlusCircleIcon />
           Skills hinzufügen
         </Button>
       </div>
       <div className="flex flex-wrap gap-1">
         {skills.map((s) => (
-          <AppBadge key={s.id} label={s.name} variant="skill" colorClass={getSkillColorClass(s)} onRemove={() => removeSkill(s.id)} />
+          <AppBadge
+            key={s.id}
+            label={s.name}
+            variant="skill"
+            colorClass={getSkillColorClass(s)}
+            onRemove={() => removeSkill(s.id)}
+          />
         ))}
       </div>
       <AddSkillDialog

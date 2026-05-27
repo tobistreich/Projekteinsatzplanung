@@ -14,7 +14,7 @@ export default function AppBadge({ label, variant, colorClass, onRemove }) {
         >
           <svg
             viewBox="0 0 10 10"
-            className="size-3 stroke-white stroke-[1.5] fill-none"
+            className="size-3 stroke-black stroke-[1.5] fill-none"
             aria-hidden
           >
             <line x1="1" y1="1" x2="9" y2="9" />

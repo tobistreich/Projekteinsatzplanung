@@ -36,7 +36,12 @@ export default function ProjectCard({
           )}
           <div className="mt-2 flex flex-wrap gap-2">
             {(skills ?? []).map((s) => (
-              <AppBadge key={s.id} label={s.name} variant="skill" colorClass={getSkillColorClass(s)} />
+              <AppBadge
+                key={s.id}
+                label={s.name}
+                variant="skill"
+                colorClass={getSkillColorClass(s)}
+              />
             ))}
           </div>
         </div>

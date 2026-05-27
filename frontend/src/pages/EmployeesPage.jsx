@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Fragment, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PlusCircleIcon } from 'lucide-react';
 
 import {
   Table,
@@ -70,7 +71,10 @@ export default function EmployeesPage() {
     <div className="p-6">
       <h1 className="text-2xl font-semibold mb-4">Mitarbeiterübersicht</h1>
       <div className="flex justify-end mb-4">
-        <Button onClick={() => setDialogOpen(true)}>Neuer Mitarbeiter</Button>
+        <Button onClick={() => setDialogOpen(true)}>
+          <PlusCircleIcon />
+          Neuer Mitarbeiter
+        </Button>
       </div>
       <AddEmployeeDialog
         open={dialogOpen}
@@ -113,7 +117,12 @@ export default function EmployeesPage() {
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {e.skills.map((s) => (
-                            <AppBadge key={s.id} label={s.name} variant="skill" colorClass={getSkillColorClass(s)} />
+                            <AppBadge
+                              key={s.id}
+                              label={s.name}
+                              variant="skill"
+                              colorClass={getSkillColorClass(s)}
+                            />
                           ))}
                         </div>
                       </TableCell>

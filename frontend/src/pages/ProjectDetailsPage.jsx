@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { CirclePlusIcon, PlusCircleIcon } from 'lucide-react';
 import AppBadge from '@/components/AppBadge';
 import AddSkillDialog from '@/components/AddSkillDialog';
 import AddAssignmentDialog from '@/components/AddAssignmentDialog';
@@ -59,6 +60,8 @@ export default function ProjectDetailsPage() {
   const [title, setTitle] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteAssignmentDialogOpen, setDeleteAssignmentDialogOpen] = useState(false);
+  const [assignmentToDelete, setAssignmentToDelete] = useState(null);
   const [skillDialogOpen, setSkillDialogOpen] = useState(false);
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
   const blurTimerRef = useRef(null);
@@ -117,7 +120,7 @@ export default function ProjectDetailsPage() {
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="text-2xl font-semibold w-auto"
+              className="text-2xl font-semibold w-[80%]"
               onFocus={handleFocus}
               onBlur={handleBlur}
             />
@@ -156,6 +159,7 @@ export default function ProjectDetailsPage() {
             </p>
             <div className="ml-auto flex gap-2">
               <Button variant="outline" onClick={() => setAssignmentDialogOpen(true)}>
+                <CirclePlusIcon />
                 Mitarbeiter zuweisen
               </Button>
               <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
@@ -176,7 +180,7 @@ export default function ProjectDetailsPage() {
               <AlertDialogFooter>
                 <AlertDialogCancel>Abbrechen</AlertDialogCancel>
                 <AlertDialogAction
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  className="bg-red-500 text-white hover:bg-red-600"
                   onClick={() =>
                     fetch(`/api/projects/${id}`, { method: 'DELETE' }).then(() =>
                       navigate('/projects')
@@ -188,6 +192,40 @@ export default function ProjectDetailsPage() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          <AlertDialog
+            open={deleteAssignmentDialogOpen}
+            onOpenChange={setDeleteAssignmentDialogOpen}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Zuweisung löschen?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Möchten Sie die Zuweisung von{' '}
+                  <strong>
+                    {assignmentToDelete?.employee.firstName} {assignmentToDelete?.employee.lastName}
+                  </strong>{' '}
+                  wirklich entfernen? Diese Aktion kann nicht rückgängig gemacht werden.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-red-500 text-white hover:bg-red-600"
+                  onClick={() =>
+                    fetch(`/api/assignments/${assignmentToDelete.id}`, { method: 'DELETE' }).then(
+                      () =>
+                        fetch(`/api/assignments/project/${id}`)
+                          .then((r) => r.json())
+                          .then(setAssignments)
+                    )
+                  }
+                >
+                  Zuweisung entfernen
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
           <AppBadge
             variant={STATUS_VARIANTS[project.status] ?? 'secondary'}
             label={STATUS_LABELS[project.status] ?? project.status}
@@ -196,6 +234,7 @@ export default function ProjectDetailsPage() {
             <div className="mb-2 flex items-center gap-2">
               <span className="text-sm font-medium">Skills</span>
               <Button variant="outline" size="sm" onClick={() => setSkillDialogOpen(true)}>
+                <PlusCircleIcon />
                 Skills hinzufügen
               </Button>
             </div>
@@ -276,7 +315,12 @@ export default function ProjectDetailsPage() {
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {(a.employee.skills ?? []).map((s) => (
-                          <AppBadge key={s.id} label={s.name} variant="skill" colorClass={getSkillColorClass(s)} />
+                          <AppBadge
+                            key={s.id}
+                            label={s.name}
+                            variant="skill"
+                            colorClass={getSkillColorClass(s)}
+                          />
                         ))}
                       </div>
                     </TableCell>
@@ -290,17 +334,8 @@ export default function ProjectDetailsPage() {
                         variant="destructive"
                         size="sm"
                         onClick={() => {
-                          if (
-                            window.confirm(
-                              'Sind Sie sicher, dass Sie diese Zuweisung löschen möchten?'
-                            )
-                          ) {
-                            fetch(`/api/assignments/${a.id}`, { method: 'DELETE' }).then(() =>
-                              fetch(`/api/assignments/project/${id}`)
-                                .then((r) => r.json())
-                                .then(setAssignments)
-                            );
-                          }
+                          setAssignmentToDelete(a);
+                          setDeleteAssignmentDialogOpen(true);
                         }}
                       >
                         Zuweisung entfernen

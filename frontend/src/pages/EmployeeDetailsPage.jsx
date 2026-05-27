@@ -110,7 +110,7 @@ export default function EmployeeDetailsPage() {
       ) : (
         <div className="m-4 space-y-4">
           <div className="flex items-start gap-4">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-olive-400 text-2xl font-semibold text-white">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-2xl font-semibold text-white">
               {employee.firstName.charAt(0).toUpperCase()}
               {employee.lastName.charAt(0).toUpperCase()}
             </div>
@@ -171,7 +171,7 @@ export default function EmployeeDetailsPage() {
                 onFocus={handleFocus}
                 onBlur={handleBlur}
               />
-              <div className="mt-2">
+              <div className="flex mt-2 justify-start">
                 <TeamBadge team={employee.team} employeeId={id} onTeamChanged={setEmployee} />
               </div>
             </div>
