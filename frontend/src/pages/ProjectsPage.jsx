@@ -52,7 +52,7 @@ export default function ProjectsPage() {
         onOpenChange={setDialogOpen}
         onProjectCreated={(p) => setProjects((prev) => [p, ...prev])}
       />
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {loading
           ? Array.from({ length: 4 }).map((_, i) => <ProjectCardSkeleton key={i} />)
           : projects.map((p) => (
