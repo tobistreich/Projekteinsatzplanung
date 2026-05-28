@@ -17,6 +17,7 @@ public class SkillService {
     @Inject
     SkillRepository skillRepository;
 
+    @Transactional
     public List<SkillDto> getAll() {
         return skillRepository.listAll().stream()
                 .map(this::toDto)

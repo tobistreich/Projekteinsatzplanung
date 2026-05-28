@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import SearchableList from '@/components/SearchableList';
+import { CirclePlusIcon } from 'lucide-react';
 
 export default function AddSkillDialog({
   open,

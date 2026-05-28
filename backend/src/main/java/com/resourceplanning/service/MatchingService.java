@@ -59,12 +59,12 @@ public class MatchingService {
     private EmployeeMatchDto toMatchDto(Employee e, Set<Long> projectSkillIds, int totalProjectSkills,
                                         YearMonth projectStart, YearMonth projectEnd) {
         List<SkillDto> allSkills = e.getSkills().stream()
-                .map(s -> SkillDto.builder().id(s.getId()).name(s.getName()).build())
+                .map(SkillDto::from)
                 .toList();
 
         List<SkillDto> matchedSkills = e.getSkills().stream()
                 .filter(s -> projectSkillIds.contains(s.getId()))
-                .map(s -> SkillDto.builder().id(s.getId()).name(s.getName()).build())
+                .map(SkillDto::from)
                 .toList();
 
         int minRemaining = computeMinRemainingCapacity(e, projectStart, projectEnd);
@@ -95,7 +95,7 @@ public class MatchingService {
             int allocated = assignments.stream()
                     .filter(a -> a.getAllocationHoursPerMonth() != null)
                     .filter(a -> !YearMonth.from(a.getStartDate()).isAfter(m)
-                              && !YearMonth.from(a.getEndDate()).isBefore(m))
+                              && (a.getEndDate() == null || !YearMonth.from(a.getEndDate()).isBefore(m)))
                     .mapToInt(Assignment::getAllocationHoursPerMonth)
                     .sum();
             min = Math.min(min, e.getMonthlyCapacityHours() - allocated);

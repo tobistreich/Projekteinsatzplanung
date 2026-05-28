@@ -103,7 +103,7 @@ public class EmployeeService {
                     .build();
         }
         List<SkillDto> skills = employee.getSkills().stream()
-                .map(s -> SkillDto.builder().id(s.getId()).name(s.getName()).build())
+                .map(SkillDto::from)
                 .toList();
 
         LocalDate today = LocalDate.now();
@@ -142,7 +142,7 @@ public class EmployeeService {
                             ? (a.getAllocationHoursPerMonth() != null ? (a.getAllocationHoursPerMonth() * 100) / employee.getMonthlyCapacityHours() : 0)
                             : 0;
                     List<SkillDto> projectSkills = a.getProject().getSkills().stream()
-                            .map(s -> SkillDto.builder().id(s.getId()).name(s.getName()).build())
+                            .map(SkillDto::from)
                             .toList();
                     return ProjectSummaryDto.builder()
                             .id(a.getProject().getId())

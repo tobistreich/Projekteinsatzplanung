@@ -23,6 +23,7 @@ public class TeamService {
     @Inject
     EmployeeRepository employeeRepository;
 
+    @Transactional
     public List<TeamDto> getAll() {
         return teamRepository.listAll().stream()
                 .map(this::toDto)
@@ -52,6 +53,7 @@ public class TeamService {
                     .firstName(lead.getFirstName())
                     .lastName(lead.getLastName())
                     .jobTitle(lead.getJobTitle())
+                    .skills(List.of())
                     .build();
         }
         return TeamDto.builder()

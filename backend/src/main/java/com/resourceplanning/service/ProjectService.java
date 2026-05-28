@@ -78,7 +78,7 @@ public class ProjectService {
 
     private ProjectDto toDto(Project project) {
         List<SkillDto> skills = project.getSkills().stream()
-                .map(s -> SkillDto.builder().id(s.getId()).name(s.getName()).build())
+                .map(SkillDto::from)
                 .toList();
         return ProjectDto.builder()
                 .id(project.getId())

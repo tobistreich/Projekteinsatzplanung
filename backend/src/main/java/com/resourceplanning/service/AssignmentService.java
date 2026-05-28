@@ -99,13 +99,13 @@ public class AssignmentService {
             int total = dto.getAllocationHoursPerMonth() + existing.stream()
                     .filter(a -> a.getAllocationHoursPerMonth() != null)
                     .filter(a -> !YearMonth.from(a.getStartDate()).isAfter(m)
-                              && !YearMonth.from(a.getEndDate()).isBefore(m))
+                              && (a.getEndDate() == null || !YearMonth.from(a.getEndDate()).isBefore(m)))
                     .mapToInt(Assignment::getAllocationHoursPerMonth)
                     .sum();
 
             if (total > employee.getMonthlyCapacityHours()) {
                 throw new BadRequestException(
-                        "Kapazität überschritten für " + m + ": " + total + "h von max. "
+                        "Capacity exceeded for " + m + ": " + total + "h of max. "
                         + employee.getMonthlyCapacityHours() + "h"
                 );
             }
@@ -124,7 +124,7 @@ public class AssignmentService {
                         .jobTitle(e.getJobTitle())
                         .skills(e.getSkills() == null ? List.of() :
                                 e.getSkills().stream()
-                                        .map(s -> SkillDto.builder().id(s.getId()).name(s.getName()).build())
+                                        .map(SkillDto::from)
                                         .toList())
                         .build())
                 .project(ProjectSummaryDto.builder()
