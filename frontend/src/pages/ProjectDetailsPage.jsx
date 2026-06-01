@@ -105,7 +105,7 @@ export default function ProjectDetailsPage() {
   async function removeSkill(skillId) {
     const updatedIds = (project.skills ?? []).filter((s) => s.id !== skillId).map((s) => s.id);
     await fetch(`/api/projects/${id}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ skillIds: updatedIds }),
     });
@@ -115,7 +115,7 @@ export default function ProjectDetailsPage() {
   async function assignSkill(skillId) {
     const updatedIds = [...(project.skills ?? []).map((s) => s.id), skillId];
     await fetch(`/api/projects/${id}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ skillIds: updatedIds }),
     });
@@ -143,7 +143,7 @@ export default function ProjectDetailsPage() {
               className={isEditing ? 'visible' : 'invisible'}
               onClick={() =>
                 fetch(`/api/projects/${id}`, {
-                  method: 'PUT',
+                  method: 'PATCH',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ title }),
                 })

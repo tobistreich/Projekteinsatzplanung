@@ -67,7 +67,7 @@ export default function AddProjectDialog({ open, onOpenChange, onProjectCreated 
 
       if (selectedSkills.length > 0) {
         await fetch(`/api/projects/${newProject.id}`, {
-          method: 'PUT',
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ skillIds: selectedSkills.map((s) => s.id) }),
         });

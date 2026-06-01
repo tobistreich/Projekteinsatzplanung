@@ -172,7 +172,7 @@ export default function EmployeeDetailsPage() {
                   className={isEditing ? '' : 'hidden'}
                   onClick={() =>
                     fetch(`/api/employees/${id}`, {
-                      method: 'PUT',
+                      method: 'PATCH',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ firstName, lastName, jobTitle }),
                     })

@@ -11,7 +11,7 @@ export default function SkillBadgeList({ skills, employeeId, onSkillsChanged }) 
   async function removeSkill(skillId) {
     const updatedIds = skills.filter((s) => s.id !== skillId).map((s) => s.id);
     await fetch(`/api/employees/${employeeId}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ skillIds: updatedIds }),
     });
@@ -21,7 +21,7 @@ export default function SkillBadgeList({ skills, employeeId, onSkillsChanged }) 
   async function assignSkill(skillId) {
     const updatedIds = [...skills.map((s) => s.id), skillId];
     await fetch(`/api/employees/${employeeId}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ skillIds: updatedIds }),
     });

@@ -25,7 +25,7 @@ export default function TeamBadge({ team, employeeId, onTeamChanged }) {
 
   async function handleSave() {
     const res = await fetch(`/api/employees/${employeeId}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ teamId: pendingTeam.id }),
     });
