@@ -2,10 +2,10 @@ package com.resourceplanning.service;
 
 import com.resourceplanning.dto.CreateProjectDto;
 import com.resourceplanning.dto.ProjectDto;
-import com.resourceplanning.dto.SkillDto;
 import com.resourceplanning.dto.UpdateProjectDto;
 import com.resourceplanning.entity.Project;
 import com.resourceplanning.entity.Skill;
+import com.resourceplanning.mapper.ProjectMapper;
 import com.resourceplanning.repository.ProjectRepository;
 import com.resourceplanning.repository.SkillRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -24,17 +24,20 @@ public class ProjectService {
     @Inject
     SkillRepository skillRepository;
 
+    @Inject
+    ProjectMapper projectMapper;
+
     @Transactional
     public List<ProjectDto> getAll() {
         return projectRepository.listAll().stream()
-                .map(this::toDto)
+                .map(projectMapper::toDto)
                 .toList();
     }
 
     @Transactional
     public ProjectDto getById(Long id) {
         return projectRepository.findByIdOptional(id)
-                .map(this::toDto)
+                .map(projectMapper::toDto)
                 .orElseThrow(() -> new NotFoundException("Project not found: " + id));
     }
 
@@ -47,7 +50,7 @@ public class ProjectService {
                 .status(dto.getStatus())
                 .build();
         projectRepository.persist(project);
-        return toDto(project);
+        return projectMapper.toDto(project);
     }
 
     @Transactional
@@ -66,7 +69,7 @@ public class ProjectService {
             project.getSkills().clear();
             project.getSkills().addAll(skills);
         }
-        return toDto(project);
+        return projectMapper.toDto(project);
     }
 
     @Transactional
@@ -74,19 +77,5 @@ public class ProjectService {
         if (!projectRepository.deleteById(id)) {
             throw new NotFoundException("Project not found: " + id);
         }
-    }
-
-    private ProjectDto toDto(Project project) {
-        List<SkillDto> skills = project.getSkills().stream()
-                .map(SkillDto::from)
-                .toList();
-        return ProjectDto.builder()
-                .id(project.getId())
-                .title(project.getTitle())
-                .startDate(project.getStartDate())
-                .endDate(project.getEndDate())
-                .status(project.getStatus())
-                .skills(skills)
-                .build();
     }
 }

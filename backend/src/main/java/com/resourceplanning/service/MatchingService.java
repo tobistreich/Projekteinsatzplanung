@@ -6,6 +6,7 @@ import com.resourceplanning.entity.Assignment;
 import com.resourceplanning.entity.Employee;
 import com.resourceplanning.entity.Project;
 import com.resourceplanning.entity.Skill;
+import com.resourceplanning.mapper.SkillMapper;
 import com.resourceplanning.repository.AssignmentRepository;
 import com.resourceplanning.repository.EmployeeRepository;
 import com.resourceplanning.repository.ProjectRepository;
@@ -31,6 +32,9 @@ public class MatchingService {
 
     @Inject
     AssignmentRepository assignmentRepository;
+
+    @Inject
+    SkillMapper skillMapper;
 
     @Transactional
     public List<EmployeeMatchDto> findMatchingEmployees(Long projectId) {
@@ -58,13 +62,11 @@ public class MatchingService {
 
     private EmployeeMatchDto toMatchDto(Employee e, Set<Long> projectSkillIds, int totalProjectSkills,
                                         YearMonth projectStart, YearMonth projectEnd) {
-        List<SkillDto> allSkills = e.getSkills().stream()
-                .map(SkillDto::from)
-                .toList();
+        List<SkillDto> allSkills = skillMapper.toDtoList(e.getSkills());
 
         List<SkillDto> matchedSkills = e.getSkills().stream()
                 .filter(s -> projectSkillIds.contains(s.getId()))
-                .map(SkillDto::from)
+                .map(skillMapper::toDto)
                 .toList();
 
         int minRemaining = computeMinRemainingCapacity(e, projectStart, projectEnd);

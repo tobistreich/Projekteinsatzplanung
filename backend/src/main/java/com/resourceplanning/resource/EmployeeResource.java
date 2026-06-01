@@ -45,7 +45,7 @@ public class EmployeeResource {
                 .build();
     }
 
-    @PUT
+    @PATCH
     @Path("/{id}")
     @Operation(summary = "Update an employee by ID")
     public EmployeeDto updateEmployee(@PathParam("id") Long id, UpdateEmployeeDto dto) {

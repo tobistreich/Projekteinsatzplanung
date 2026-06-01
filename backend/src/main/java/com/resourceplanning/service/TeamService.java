@@ -3,6 +3,7 @@ package com.resourceplanning.service;
 import com.resourceplanning.dto.CreateTeamDto;
 import com.resourceplanning.dto.TeamDto;
 import com.resourceplanning.entity.Team;
+import com.resourceplanning.mapper.TeamMapper;
 import com.resourceplanning.repository.TeamRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -16,10 +17,13 @@ public class TeamService {
     @Inject
     TeamRepository teamRepository;
 
+    @Inject
+    TeamMapper teamMapper;
+
     @Transactional
     public List<TeamDto> getAll() {
         return teamRepository.listAll().stream()
-                .map(this::toDto)
+                .map(teamMapper::toDto)
                 .toList();
     }
 
@@ -29,13 +33,6 @@ public class TeamService {
                 .name(dto.getName())
                 .build();
         teamRepository.persist(team);
-        return toDto(team);
-    }
-
-    private TeamDto toDto(Team team) {
-        return TeamDto.builder()
-                .id(team.getId())
-                .name(team.getName())
-                .build();
+        return teamMapper.toDto(team);
     }
 }

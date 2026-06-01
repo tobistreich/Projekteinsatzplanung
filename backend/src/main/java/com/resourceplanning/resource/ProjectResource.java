@@ -50,7 +50,7 @@ public class ProjectResource {
                 .build();
     }
 
-    @PUT
+    @PATCH
     @Path("/{id}")
     @Operation(summary = "Update a project by ID")
     public ProjectDto updateProject(@PathParam("id") Long id, UpdateProjectDto dto) {

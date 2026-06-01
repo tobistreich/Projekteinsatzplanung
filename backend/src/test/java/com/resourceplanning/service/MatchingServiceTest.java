@@ -6,6 +6,7 @@ import com.resourceplanning.entity.Employee;
 import com.resourceplanning.entity.Project;
 import com.resourceplanning.entity.ProjectStatus;
 import com.resourceplanning.entity.Skill;
+import com.resourceplanning.mapper.SkillMapper;
 import com.resourceplanning.repository.AssignmentRepository;
 import com.resourceplanning.repository.EmployeeRepository;
 import com.resourceplanning.repository.ProjectRepository;
@@ -30,6 +31,7 @@ class MatchingServiceTest {
     @Mock ProjectRepository projectRepository;
     @Mock EmployeeRepository employeeRepository;
     @Mock AssignmentRepository assignmentRepository;
+    @Mock SkillMapper skillMapper;
     @InjectMocks MatchingService matchingService;
 
     @Test

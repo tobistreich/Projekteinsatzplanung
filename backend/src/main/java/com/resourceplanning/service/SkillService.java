@@ -3,6 +3,7 @@ package com.resourceplanning.service;
 import com.resourceplanning.dto.CreateSkillDto;
 import com.resourceplanning.dto.SkillDto;
 import com.resourceplanning.entity.Skill;
+import com.resourceplanning.mapper.SkillMapper;
 import com.resourceplanning.repository.SkillRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -17,11 +18,12 @@ public class SkillService {
     @Inject
     SkillRepository skillRepository;
 
+    @Inject
+    SkillMapper skillMapper;
+
     @Transactional
     public List<SkillDto> getAll() {
-        return skillRepository.listAll().stream()
-                .map(this::toDto)
-                .toList();
+        return skillMapper.toDtoList(skillRepository.listAll());
     }
 
     @Transactional
@@ -30,7 +32,7 @@ public class SkillService {
                 .name(dto.getName())
                 .build();
         skillRepository.persist(skill);
-        return toDto(skill);
+        return skillMapper.toDto(skill);
     }
 
     @Transactional
@@ -38,12 +40,5 @@ public class SkillService {
         if (!skillRepository.deleteById(id)) {
             throw new NotFoundException("Skill not found: " + id);
         }
-    }
-
-    private SkillDto toDto(Skill skill) {
-        return SkillDto.builder()
-                .id(skill.getId())
-                .name(skill.getName())
-                .build();
     }
 }

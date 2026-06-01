@@ -2,12 +2,10 @@ package com.resourceplanning.service;
 
 import com.resourceplanning.dto.AssignmentDto;
 import com.resourceplanning.dto.CreateAssignmentDto;
-import com.resourceplanning.dto.EmployeeSummaryDto;
-import com.resourceplanning.dto.ProjectSummaryDto;
-import com.resourceplanning.dto.SkillDto;
 import com.resourceplanning.entity.Assignment;
 import com.resourceplanning.entity.Employee;
 import com.resourceplanning.entity.Project;
+import com.resourceplanning.mapper.AssignmentMapper;
 import com.resourceplanning.repository.AssignmentRepository;
 import com.resourceplanning.repository.EmployeeRepository;
 import com.resourceplanning.repository.ProjectRepository;
@@ -32,31 +30,34 @@ public class AssignmentService {
     @Inject
     ProjectRepository projectRepository;
 
+    @Inject
+    AssignmentMapper assignmentMapper;
+
     @Transactional
     public List<AssignmentDto> getAll() {
         return assignmentRepository.listAll().stream()
-                .map(this::toDto)
+                .map(assignmentMapper::toDto)
                 .toList();
     }
 
     @Transactional
     public AssignmentDto getById(Long id) {
         return assignmentRepository.findByIdOptional(id)
-                .map(this::toDto)
+                .map(assignmentMapper::toDto)
                 .orElseThrow(() -> new NotFoundException("Assignment not found: " + id));
     }
 
     @Transactional
     public List<AssignmentDto> getByEmployee(Long employeeId) {
         return assignmentRepository.findByEmployeeId(employeeId).stream()
-                .map(this::toDto)
+                .map(assignmentMapper::toDto)
                 .toList();
     }
 
     @Transactional
     public List<AssignmentDto> getByProject(Long projectId) {
         return assignmentRepository.findByProjectId(projectId).stream()
-                .map(this::toDto)
+                .map(assignmentMapper::toDto)
                 .toList();
     }
 
@@ -76,7 +77,7 @@ public class AssignmentService {
                 .billable(dto.getBillable())
                 .build();
         assignmentRepository.persist(assignment);
-        return toDto(assignment);
+        return assignmentMapper.toDto(assignment);
     }
 
     @Transactional
@@ -110,32 +111,5 @@ public class AssignmentService {
                 );
             }
         }
-    }
-
-    private AssignmentDto toDto(Assignment assignment) {
-        Employee e = assignment.getEmployee();
-        Project p = assignment.getProject();
-        return AssignmentDto.builder()
-                .id(assignment.getId())
-                .employee(EmployeeSummaryDto.builder()
-                        .id(e.getId())
-                        .firstName(e.getFirstName())
-                        .lastName(e.getLastName())
-                        .jobTitle(e.getJobTitle())
-                        .skills(e.getSkills() == null ? List.of() :
-                                e.getSkills().stream()
-                                        .map(SkillDto::from)
-                                        .toList())
-                        .build())
-                .project(ProjectSummaryDto.builder()
-                        .id(p.getId())
-                        .title(p.getTitle())
-                        .status(p.getStatus())
-                        .build())
-                .startDate(assignment.getStartDate())
-                .endDate(assignment.getEndDate())
-                .allocationHoursPerMonth(assignment.getAllocationHoursPerMonth())
-                .billable(assignment.getBillable())
-                .build();
     }
 }

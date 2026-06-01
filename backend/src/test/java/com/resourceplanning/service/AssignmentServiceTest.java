@@ -5,6 +5,7 @@ import com.resourceplanning.entity.Assignment;
 import com.resourceplanning.entity.Employee;
 import com.resourceplanning.entity.Project;
 import com.resourceplanning.entity.ProjectStatus;
+import com.resourceplanning.mapper.AssignmentMapper;
 import com.resourceplanning.repository.AssignmentRepository;
 import com.resourceplanning.repository.EmployeeRepository;
 import com.resourceplanning.repository.ProjectRepository;
@@ -33,6 +34,7 @@ class AssignmentServiceTest {
     @Mock AssignmentRepository assignmentRepository;
     @Mock EmployeeRepository employeeRepository;
     @Mock ProjectRepository projectRepository;
+    @Mock AssignmentMapper assignmentMapper;
     @InjectMocks AssignmentService assignmentService;
 
     @Test

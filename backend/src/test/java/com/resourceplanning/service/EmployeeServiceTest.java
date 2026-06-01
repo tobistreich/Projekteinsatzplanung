@@ -6,6 +6,8 @@ import com.resourceplanning.entity.Assignment;
 import com.resourceplanning.entity.Employee;
 import com.resourceplanning.entity.Project;
 import com.resourceplanning.entity.ProjectStatus;
+import com.resourceplanning.mapper.EmployeeMapper;
+import com.resourceplanning.mapper.SkillMapper;
 import com.resourceplanning.repository.AssignmentRepository;
 import com.resourceplanning.repository.EmployeeRepository;
 import com.resourceplanning.repository.SkillRepository;
@@ -36,6 +38,8 @@ class EmployeeServiceTest {
     @Mock AssignmentRepository assignmentRepository;
     @Mock TeamRepository teamRepository;
     @Mock SkillRepository skillRepository;
+    @Mock EmployeeMapper employeeMapper;
+    @Mock SkillMapper skillMapper;
     @InjectMocks EmployeeService employeeService;
 
     @Test
@@ -51,8 +55,14 @@ class EmployeeServiceTest {
         CreateEmployeeDto dto = CreateEmployeeDto.builder()
                 .firstName("Anna").lastName("Schmidt").jobTitle("Developer").monthlyCapacityHours(160)
                 .build();
-        // ID is null after mock persist, so stub with nullable matcher
         when(assignmentRepository.findByEmployeeId(nullable(Long.class))).thenReturn(List.of());
+        when(employeeMapper.toBaseDto(any(Employee.class))).thenAnswer(inv -> {
+            Employee e = inv.getArgument(0);
+            return EmployeeDto.builder()
+                    .id(e.getId()).firstName(e.getFirstName()).lastName(e.getLastName())
+                    .jobTitle(e.getJobTitle()).monthlyCapacityHours(e.getMonthlyCapacityHours())
+                    .skills(List.of()).build();
+        });
 
         EmployeeDto result = employeeService.create(dto);
 
@@ -67,6 +77,13 @@ class EmployeeServiceTest {
         Assignment a = assignment(emp, LocalDate.now().minusMonths(1), LocalDate.now().plusMonths(1), 80, true);
         when(employeeRepository.findByIdOptional(1L)).thenReturn(Optional.of(emp));
         when(assignmentRepository.findByEmployeeId(1L)).thenReturn(List.of(a));
+        when(employeeMapper.toBaseDto(any(Employee.class))).thenAnswer(inv -> {
+            Employee e = inv.getArgument(0);
+            return EmployeeDto.builder()
+                    .id(e.getId()).firstName(e.getFirstName()).lastName(e.getLastName())
+                    .monthlyCapacityHours(e.getMonthlyCapacityHours())
+                    .skills(List.of()).build();
+        });
 
         EmployeeDto dto = employeeService.getById(1L);
 
@@ -81,6 +98,13 @@ class EmployeeServiceTest {
         Assignment a = assignment(emp, LocalDate.now().plusMonths(2), LocalDate.now().plusMonths(6), 100, true);
         when(employeeRepository.findByIdOptional(1L)).thenReturn(Optional.of(emp));
         when(assignmentRepository.findByEmployeeId(1L)).thenReturn(List.of(a));
+        when(employeeMapper.toBaseDto(any(Employee.class))).thenAnswer(inv -> {
+            Employee e = inv.getArgument(0);
+            return EmployeeDto.builder()
+                    .id(e.getId()).firstName(e.getFirstName()).lastName(e.getLastName())
+                    .monthlyCapacityHours(e.getMonthlyCapacityHours())
+                    .skills(List.of()).build();
+        });
 
         EmployeeDto dto = employeeService.getById(1L);
 

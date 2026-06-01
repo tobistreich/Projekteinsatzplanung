@@ -5,16 +5,18 @@ import com.resourceplanning.entity.Assignment;
 import com.resourceplanning.entity.Employee;
 import com.resourceplanning.entity.Skill;
 import com.resourceplanning.entity.Team;
+import com.resourceplanning.mapper.EmployeeMapper;
+import com.resourceplanning.mapper.SkillMapper;
 import com.resourceplanning.repository.AssignmentRepository;
 import com.resourceplanning.repository.EmployeeRepository;
 import com.resourceplanning.repository.SkillRepository;
 import com.resourceplanning.repository.TeamRepository;
-import java.time.LocalDate;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @ApplicationScoped
@@ -31,6 +33,12 @@ public class EmployeeService {
 
     @Inject
     AssignmentRepository assignmentRepository;
+
+    @Inject
+    EmployeeMapper employeeMapper;
+
+    @Inject
+    SkillMapper skillMapper;
 
     @Transactional
     public List<EmployeeDto> getAll() {
@@ -95,17 +103,6 @@ public class EmployeeService {
     }
 
     private EmployeeDto toDto(Employee employee) {
-        TeamSummaryDto teamDto = null;
-        if (employee.getTeam() != null) {
-            teamDto = TeamSummaryDto.builder()
-                    .id(employee.getTeam().getId())
-                    .name(employee.getTeam().getName())
-                    .build();
-        }
-        List<SkillDto> skills = employee.getSkills().stream()
-                .map(SkillDto::from)
-                .toList();
-
         LocalDate today = LocalDate.now();
 
         List<Assignment> allAssignments = assignmentRepository.findByEmployeeId(employee.getId());
@@ -126,29 +123,17 @@ public class EmployeeService {
                 .mapToInt(a -> a.getAllocationHoursPerMonth() != null ? a.getAllocationHoursPerMonth() : 0)
                 .sum();
 
-        Integer availabilityPercent = (employee.getMonthlyCapacityHours() != null && employee.getMonthlyCapacityHours() > 0)
-                ? Math.min((totalAllocated * 100) / employee.getMonthlyCapacityHours(), 100)
-                : 0;
-        Integer billablePercent = totalAllocated > 0
-                ? (billableAllocated * 100) / totalAllocated
-                : 0;
-        Integer internalPercent = totalAllocated > 0
-                ? (internalAllocated * 100) / totalAllocated
-                : 0;
+        int cap = employee.getMonthlyCapacityHours() != null ? employee.getMonthlyCapacityHours() : 0;
 
         List<ProjectSummaryDto> projects = activeAndUpcomingAssignments.stream()
                 .map(a -> {
-                    int allocPercent = (employee.getMonthlyCapacityHours() != null && employee.getMonthlyCapacityHours() > 0)
-                            ? (a.getAllocationHoursPerMonth() != null ? (a.getAllocationHoursPerMonth() * 100) / employee.getMonthlyCapacityHours() : 0)
-                            : 0;
-                    List<SkillDto> projectSkills = a.getProject().getSkills().stream()
-                            .map(SkillDto::from)
-                            .toList();
+                    int allocPercent = cap > 0 && a.getAllocationHoursPerMonth() != null
+                            ? (a.getAllocationHoursPerMonth() * 100) / cap : 0;
                     return ProjectSummaryDto.builder()
                             .id(a.getProject().getId())
                             .title(a.getProject().getTitle())
                             .status(a.getProject().getStatus())
-                            .skills(projectSkills)
+                            .skills(skillMapper.toDtoList(a.getProject().getSkills()))
                             .allocationPercent(allocPercent)
                             .allocationHoursPerMonth(a.getAllocationHoursPerMonth())
                             .billable(a.getBillable())
@@ -158,21 +143,18 @@ public class EmployeeService {
                 })
                 .toList();
 
-        return EmployeeDto.builder()
-                .id(employee.getId())
-                .firstName(employee.getFirstName())
-                .lastName(employee.getLastName())
-                .jobTitle(employee.getJobTitle())
-                .monthlyCapacityHours(employee.getMonthlyCapacityHours())
-                .availabilityPercent(availabilityPercent)
-                .allocatedHours(totalAllocated)
-                .billablePercent(billablePercent)
-                .billableAllocatedHours(billableAllocated)
-                .internalPercent(internalPercent)
-                .internalAllocatedHours(internalAllocated)
-                .projects(projects)
-                .skills(skills)
-                .team(teamDto)
-                .build();
+        // MapStruct mappt strukturelle Felder (id, name, team, skills)
+        EmployeeDto dto = employeeMapper.toBaseDto(employee);
+
+        // Business-Logik-Metriken werden vom Service gesetzt
+        dto.setAvailabilityPercent(cap > 0 ? Math.min((totalAllocated * 100) / cap, 100) : 0);
+        dto.setAllocatedHours(totalAllocated);
+        dto.setBillablePercent(totalAllocated > 0 ? (billableAllocated * 100) / totalAllocated : 0);
+        dto.setBillableAllocatedHours(billableAllocated);
+        dto.setInternalPercent(totalAllocated > 0 ? (internalAllocated * 100) / totalAllocated : 0);
+        dto.setInternalAllocatedHours(internalAllocated);
+        dto.setProjects(projects);
+
+        return dto;
     }
 }
