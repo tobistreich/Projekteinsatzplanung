@@ -48,6 +48,12 @@
             <artifactId>quarkus-jdbc-mysql</artifactId>
         </dependency>
 
+        <!-- Flyway -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-flyway</artifactId>
+        </dependency>
+
         <!-- OpenAPI / Swagger -->
         <dependency>
             <groupId>io.quarkus</groupId>

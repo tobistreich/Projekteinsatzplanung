@@ -10,5 +10,4 @@ import lombok.*;
 @RegisterForReflection
 public class CreateTeamDto {
     private String name;
-    private Long teamLeadId;
 }

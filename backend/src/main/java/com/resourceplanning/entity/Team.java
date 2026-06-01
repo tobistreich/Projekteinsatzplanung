@@ -19,8 +19,4 @@ public class Team {
 
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_lead_id")
-    @ToString.Exclude
-    private Employee teamLead;
 }

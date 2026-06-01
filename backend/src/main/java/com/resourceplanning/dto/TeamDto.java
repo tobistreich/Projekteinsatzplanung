@@ -11,5 +11,4 @@ import lombok.*;
 public class TeamDto {
     private Long id;
     private String name;
-    private EmployeeSummaryDto teamLead;
 }
