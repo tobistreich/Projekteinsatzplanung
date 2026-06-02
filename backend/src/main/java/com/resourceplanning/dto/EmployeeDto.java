@@ -16,7 +16,7 @@ public class EmployeeDto {
     private String lastName;
     private String jobTitle;
     private Integer monthlyCapacityHours;
-    private Integer availabilityPercent;
+    private Integer utilizationPercent;
     private Integer allocatedHours;
     private Integer billablePercent;
     private Integer billableAllocatedHours;

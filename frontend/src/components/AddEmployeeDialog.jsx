@@ -17,15 +17,7 @@ export default function AddEmployeeDialog({ open, onOpenChange, onEmployeeCreate
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!open) {
-      setFirstName('');
-      setLastName('');
-      setJobTitle('');
-      setMonthlyCapacityHours('');
-      setSelectedTeam(null);
-      setTeamQuery('');
-      return;
-    }
+    if (!open) return;
     fetch('/api/teams')
       .then((res) => res.json())
       .then(setAllTeams);
@@ -60,9 +52,12 @@ export default function AddEmployeeDialog({ open, onOpenChange, onEmployeeCreate
           teamId: selectedTeam.id,
         }),
       });
+      if (!res.ok) throw new Error(await res.text());
       const newEmployee = await res.json();
       onEmployeeCreated(newEmployee);
       onOpenChange(false);
+    } catch (err) {
+      alert(`Fehler: ${err.message}`);
     } finally {
       setSubmitting(false);
     }

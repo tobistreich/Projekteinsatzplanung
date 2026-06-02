@@ -5,8 +5,9 @@ import AddSkillDialog from '@/components/AddSkillDialog';
 import { Button } from '@/components/ui/button';
 import { PlusCircleIcon } from 'lucide-react';
 
-export default function SkillBadgeList({ skills, employeeId, onSkillsChanged }) {
+export default function SkillBadgeList({ skills = [], employeeId, onSkillsChanged }) {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogKey, setDialogKey] = useState(0);
 
   async function removeSkill(skillId) {
     const updatedIds = skills.filter((s) => s.id !== skillId).map((s) => s.id);
@@ -31,13 +32,17 @@ export default function SkillBadgeList({ skills, employeeId, onSkillsChanged }) 
     <div>
       <div className="mb-2 flex items-center gap-2">
         <span className="text-sm font-medium">Skills</span>
-        <Button variant="outline" size="sm" onClick={() => setDialogOpen(true)}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => { setDialogKey((k) => k + 1); setDialogOpen(true); }}
+        >
           <PlusCircleIcon />
           Skills hinzufügen
         </Button>
       </div>
       <div className="flex flex-wrap gap-1">
-        {skills.map((s) => (
+        {(skills ?? []).map((s) => (
           <AppBadge
             key={s.id}
             label={s.name}
@@ -48,6 +53,7 @@ export default function SkillBadgeList({ skills, employeeId, onSkillsChanged }) 
         ))}
       </div>
       <AddSkillDialog
+        key={dialogKey}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         currentSkills={skills}

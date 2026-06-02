@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CirclePlusIcon, PlusCircleIcon } from 'lucide-react';
 import AppBadge from '@/components/AppBadge';
@@ -63,6 +63,7 @@ export default function ProjectDetailsPage() {
   const [deleteAssignmentDialogOpen, setDeleteAssignmentDialogOpen] = useState(false);
   const [assignmentToDelete, setAssignmentToDelete] = useState(null);
   const [skillDialogOpen, setSkillDialogOpen] = useState(false);
+  const [skillDialogKey, setSkillDialogKey] = useState(0);
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
   const blurTimerRef = useRef(null);
 
@@ -75,29 +76,28 @@ export default function ProjectDetailsPage() {
   };
 
   const fetchAssignments = useCallback(
-    () =>
-      fetch(`/api/assignments/project/${id}`)
-        .then((r) => r.json())
-        .then((asns) =>
-          Promise.all(
-            asns.map((a) =>
-              fetch(`/api/employees/${a.employee.id}`)
-                .then((r) => r.json())
-                .then((emp) => ({ ...a, employee: emp }))
-            )
-          )
-        ),
+    () => fetch(`/api/assignments/project/${id}`).then((r) => r.json()),
     [id]
   );
 
   useEffect(() => {
-    Promise.all([fetch(`/api/projects/${id}`).then((r) => r.json()), fetchAssignments()]).then(
-      ([proj, enrichedAsns]) => {
+    const controller = new AbortController();
+    Promise.all([
+      fetch(`/api/projects/${id}`, { signal: controller.signal }).then((r) => {
+        if (!r.ok) throw new Error(`Projekt nicht gefunden (${r.status})`);
+        return r.json();
+      }),
+      fetchAssignments(),
+    ])
+      .then(([proj, asns]) => {
         setProject(proj);
         setTitle(proj.title);
-        setAssignments(enrichedAsns);
-      }
-    );
+        setAssignments(asns);
+      })
+      .catch((err) => {
+        if (err.name === 'AbortError') return;
+      });
+    return () => controller.abort();
   }, [id, fetchAssignments]);
 
   const totalHours = assignments.reduce((s, a) => s + (a.allocationHoursPerMonth ?? 0), 0);
@@ -245,7 +245,11 @@ export default function ProjectDetailsPage() {
           <div>
             <div className="mb-2 flex items-center gap-2">
               <span className="text-sm font-medium">Skills</span>
-              <Button variant="outline" size="sm" onClick={() => setSkillDialogOpen(true)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { setSkillDialogKey((k) => k + 1); setSkillDialogOpen(true); }}
+              >
                 <PlusCircleIcon />
                 Skills hinzufügen
               </Button>
@@ -262,6 +266,7 @@ export default function ProjectDetailsPage() {
               ))}
             </div>
             <AddSkillDialog
+              key={skillDialogKey}
               open={skillDialogOpen}
               onOpenChange={setSkillDialogOpen}
               currentSkills={project.skills ?? []}

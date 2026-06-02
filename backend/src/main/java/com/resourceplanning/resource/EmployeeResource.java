@@ -6,6 +6,7 @@ import com.resourceplanning.dto.UpdateEmployeeDto;
 import com.resourceplanning.service.EmployeeService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -39,7 +40,7 @@ public class EmployeeResource {
 
     @POST
     @Operation(summary = "Create a new employee")
-    public Response createEmployee(CreateEmployeeDto dto) {
+    public Response createEmployee(@Valid CreateEmployeeDto dto) {
         return Response.status(Response.Status.CREATED)
                 .entity(employeeService.create(dto))
                 .build();

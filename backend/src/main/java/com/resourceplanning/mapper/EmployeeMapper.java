@@ -12,7 +12,7 @@ import org.mapstruct.Mapping;
  */
 @Mapper(componentModel = "jakarta-cdi", uses = {SkillMapper.class, TeamMapper.class})
 public interface EmployeeMapper {
-    @Mapping(target = "availabilityPercent",    ignore = true)
+    @Mapping(target = "utilizationPercent",      ignore = true)
     @Mapping(target = "allocatedHours",         ignore = true)
     @Mapping(target = "billablePercent",        ignore = true)
     @Mapping(target = "billableAllocatedHours", ignore = true)

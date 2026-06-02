@@ -14,6 +14,8 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 
 import java.time.YearMonth;
 import java.util.List;
@@ -63,11 +65,30 @@ public class AssignmentService {
 
     @Transactional
     public AssignmentDto create(CreateAssignmentDto dto) {
+        if (dto.getStartDate() == null) {
+            throw new BadRequestException("startDate is required");
+        }
+        if (dto.getAllocationHoursPerMonth() == null) {
+            throw new BadRequestException("allocationHoursPerMonth is required");
+        }
+
         Employee employee = employeeRepository.findByIdOptional(dto.getEmployeeId())
                 .orElseThrow(() -> new NotFoundException("Employee not found: " + dto.getEmployeeId()));
         Project project = projectRepository.findByIdOptional(dto.getProjectId())
                 .orElseThrow(() -> new NotFoundException("Project not found: " + dto.getProjectId()));
+
+        boolean duplicate = assignmentRepository.findByEmployeeId(employee.getId()).stream()
+                .anyMatch(a -> a.getProject().getId().equals(project.getId()));
+        if (duplicate) {
+            throw new WebApplicationException(
+                    Response.status(Response.Status.CONFLICT)
+                            .entity("Employee is already assigned to this project")
+                            .build()
+            );
+        }
+
         validateCapacity(employee, dto);
+
         Assignment assignment = Assignment.builder()
                 .employee(employee)
                 .project(project)
@@ -88,7 +109,7 @@ public class AssignmentService {
     }
 
     private void validateCapacity(Employee employee, CreateAssignmentDto dto) {
-        if (employee.getMonthlyCapacityHours() == null || dto.getAllocationHoursPerMonth() == null) return;
+        if (employee.getMonthlyCapacityHours() == null) return;
 
         List<Assignment> existing = assignmentRepository.findByEmployeeId(employee.getId());
 

@@ -8,6 +8,7 @@ import com.resourceplanning.service.MatchingService;
 import com.resourceplanning.service.ProjectService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -44,7 +45,7 @@ public class ProjectResource {
 
     @POST
     @Operation(summary = "Create a new project")
-    public Response createProject(CreateProjectDto dto) {
+    public Response createProject(@Valid CreateProjectDto dto) {
         return Response.status(Response.Status.CREATED)
                 .entity(projectService.create(dto))
                 .build();

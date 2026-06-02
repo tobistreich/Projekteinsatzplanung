@@ -19,15 +19,7 @@ export default function AddProjectDialog({ open, onOpenChange, onProjectCreated 
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!open) {
-      setTitle('');
-      setStartDate('');
-      setEndDate('');
-      setStatus('PLANNED');
-      setSelectedSkills([]);
-      setSkillQuery('');
-      return;
-    }
+    if (!open) return;
     fetch('/api/skills/')
       .then((res) => res.json())
       .then(setAllSkills);
@@ -63,14 +55,16 @@ export default function AddProjectDialog({ open, onOpenChange, onProjectCreated 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: title.trim(), startDate, endDate, status }),
       });
+      if (!res.ok) throw new Error(await res.text());
       const newProject = await res.json();
 
       if (selectedSkills.length > 0) {
-        await fetch(`/api/projects/${newProject.id}`, {
+        const patchRes = await fetch(`/api/projects/${newProject.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ skillIds: selectedSkills.map((s) => s.id) }),
         });
+        if (!patchRes.ok) throw new Error(await patchRes.text());
         newProject.skills = selectedSkills;
       } else {
         newProject.skills = [];
@@ -78,6 +72,8 @@ export default function AddProjectDialog({ open, onOpenChange, onProjectCreated 
 
       onProjectCreated(newProject);
       onOpenChange(false);
+    } catch (err) {
+      alert(`Fehler: ${err.message}`);
     } finally {
       setSubmitting(false);
     }

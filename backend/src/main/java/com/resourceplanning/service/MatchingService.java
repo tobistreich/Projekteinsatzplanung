@@ -50,8 +50,12 @@ public class MatchingService {
                 .map(Skill::getId)
                 .collect(Collectors.toSet());
 
-        YearMonth projectStart = project.getStartDate() != null ? YearMonth.from(project.getStartDate()) : null;
-        YearMonth projectEnd = project.getEndDate() != null ? YearMonth.from(project.getEndDate()) : null;
+        YearMonth projectStart = project.getStartDate() != null
+                ? YearMonth.from(project.getStartDate())
+                : YearMonth.now();
+        YearMonth projectEnd = project.getEndDate() != null
+                ? YearMonth.from(project.getEndDate())
+                : projectStart.plusYears(10);
 
         return employeeRepository.findByAnySkillIn(new java.util.ArrayList<>(projectSkillIds)).stream()
                 .map(e -> toMatchDto(e, projectSkillIds, projectSkills.size(), projectStart, projectEnd))
@@ -87,7 +91,6 @@ public class MatchingService {
 
     private int computeMinRemainingCapacity(Employee e, YearMonth start, YearMonth end) {
         if (e.getMonthlyCapacityHours() == null) return 0;
-        if (start == null || end == null) return e.getMonthlyCapacityHours();
 
         List<Assignment> assignments = assignmentRepository.findByEmployeeId(e.getId());
         int min = e.getMonthlyCapacityHours();

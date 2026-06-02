@@ -31,6 +31,7 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogKey, setDialogKey] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,11 +44,15 @@ export default function ProjectsPage() {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-semibold">Projektübersicht</h1>
-      <Button className="mt-4 px-4 py-2" onClick={() => setDialogOpen(true)}>
+      <Button
+        className="mt-4 px-4 py-2"
+        onClick={() => { setDialogKey((k) => k + 1); setDialogOpen(true); }}
+      >
         <PlusCircleIcon />
         Projekt hinzufügen
       </Button>
       <AddProjectDialog
+        key={dialogKey}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         onProjectCreated={(p) => setProjects((prev) => [p, ...prev])}

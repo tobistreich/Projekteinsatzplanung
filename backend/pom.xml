@@ -54,6 +54,12 @@
             <artifactId>quarkus-flyway</artifactId>
         </dependency>
 
+        <!-- Bean Validation -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-validator</artifactId>
+        </dependency>
+
         <!-- OpenAPI / Swagger -->
         <dependency>
             <groupId>io.quarkus</groupId>

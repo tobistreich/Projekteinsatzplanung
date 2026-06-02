@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import SearchableList from '@/components/SearchableList';
-import { CirclePlusIcon } from 'lucide-react';
 
 export default function AddSkillDialog({
   open,
@@ -14,10 +13,7 @@ export default function AddSkillDialog({
   const [allSkills, setAllSkills] = useState([]);
 
   useEffect(() => {
-    if (!open) {
-      setQuery('');
-      return;
-    }
+    if (!open) return;
     fetch('/api/skills/')
       .then((res) => res.json())
       .then(setAllSkills);

@@ -100,14 +100,22 @@ export default function EmployeeDetailsPage() {
   };
 
   useEffect(() => {
-    fetch(`/api/employees/${id}`)
-      .then((res) => res.json())
+    const controller = new AbortController();
+    fetch(`/api/employees/${id}`, { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Mitarbeiter nicht gefunden (${res.status})`);
+        return res.json();
+      })
       .then((data) => {
         setEmployee(data);
         setFirstName(data.firstName);
         setLastName(data.lastName);
         setJobTitle(data.jobTitle);
+      })
+      .catch((err) => {
+        if (err.name === 'AbortError') return;
       });
+    return () => controller.abort();
   }, [id]);
 
   return (
@@ -229,7 +237,7 @@ export default function EmployeeDetailsPage() {
             <Card className="outline-solid outline-3">
               <CardContent className="pt-6">
                 <h2 className="mb-4">Auslastung</h2>
-                <Workload className="m-8 p-8" value={employee.availabilityPercent} max={100} />
+                <Workload className="m-8 p-8" value={employee.utilizationPercent} max={100} />
                 <p className="mt-2 text-center font-medium">
                   {employee.allocatedHours ?? 0} / {employee.monthlyCapacityHours ?? 0} h des Monats
                   verplant
@@ -283,7 +291,7 @@ export default function EmployeeDetailsPage() {
             <div className="mt-2 flex justify-between text-sm font-medium">
               <span>Verbleibende freie Kapazität</span>
               <span>
-                {100 - (employee.availabilityPercent ?? 0)}%{' · '}
+                {100 - (employee.utilizationPercent ?? 0)}%{' · '}
                 {(employee.monthlyCapacityHours ?? 0) - (employee.allocatedHours ?? 0)} h / Monat
               </span>
             </div>

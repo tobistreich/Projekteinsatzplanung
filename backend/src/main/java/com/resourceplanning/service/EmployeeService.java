@@ -147,7 +147,7 @@ public class EmployeeService {
         EmployeeDto dto = employeeMapper.toBaseDto(employee);
 
         // Business-Logik-Metriken werden vom Service gesetzt
-        dto.setAvailabilityPercent(cap > 0 ? Math.min((totalAllocated * 100) / cap, 100) : 0);
+        dto.setUtilizationPercent(cap > 0 ? Math.min((totalAllocated * 100) / cap, 100) : 0);
         dto.setAllocatedHours(totalAllocated);
         dto.setBillablePercent(totalAllocated > 0 ? (billableAllocated * 100) / totalAllocated : 0);
         dto.setBillableAllocatedHours(billableAllocated);

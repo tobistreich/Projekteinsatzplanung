@@ -5,6 +5,7 @@ import com.resourceplanning.dto.CreateAssignmentDto;
 import com.resourceplanning.service.AssignmentService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -52,7 +53,7 @@ public class AssignmentResource {
 
     @POST
     @Operation(summary = "Create a new assignment")
-    public Response createAssignment(CreateAssignmentDto dto) {
+    public Response createAssignment(@Valid CreateAssignmentDto dto) {
         return Response.status(Response.Status.CREATED)
                 .entity(assignmentService.create(dto))
                 .build();

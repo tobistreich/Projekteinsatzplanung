@@ -2,6 +2,7 @@ package com.resourceplanning.dto;
 
 import com.resourceplanning.entity.ProjectStatus;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @Builder
 @RegisterForReflection
 public class CreateProjectDto {
+    @NotBlank
     private String title;
     private LocalDate startDate;
     private LocalDate endDate;
